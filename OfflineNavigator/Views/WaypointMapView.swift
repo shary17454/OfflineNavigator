@@ -16,10 +16,15 @@ struct WaypointMapView: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         let existing = mapView.annotations.compactMap { $0 as? WaypointAnnotation }
-        mapView.removeAnnotations(existing)
-        mapView.addAnnotations(waypoints.map(WaypointAnnotation.init))
+        let existingIDs = Set(existing.map(\.waypointID))
+        let waypointIDs = Set(waypoints.map(\.id))
+        if existingIDs != waypointIDs {
+            mapView.removeAnnotations(existing)
+            mapView.addAnnotations(waypoints.map(WaypointAnnotation.init))
+        }
 
-        if let selectedWaypoint {
+        if let selectedWaypoint, context.coordinator.focusedWaypointID != selectedWaypoint.id {
+            context.coordinator.focusedWaypointID = selectedWaypoint.id
             mapView.setRegion(
                 MKCoordinateRegion(
                     center: selectedWaypoint.coordinate,
@@ -28,7 +33,8 @@ struct WaypointMapView: UIViewRepresentable {
                 ),
                 animated: true
             )
-        } else if let currentLocation, mapView.region.span.latitudeDelta > 40 {
+        } else if selectedWaypoint == nil, let currentLocation, !context.coordinator.didSetInitialRegion {
+            context.coordinator.didSetInitialRegion = true
             mapView.setRegion(
                 MKCoordinateRegion(
                     center: currentLocation,
@@ -45,6 +51,9 @@ struct WaypointMapView: UIViewRepresentable {
     }
 
     final class Coordinator: NSObject, MKMapViewDelegate {
+        var focusedWaypointID: UUID?
+        var didSetInitialRegion = false
+
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
             guard annotation is WaypointAnnotation else { return nil }
 
@@ -60,11 +69,13 @@ struct WaypointMapView: UIViewRepresentable {
 }
 
 final class WaypointAnnotation: NSObject, MKAnnotation {
+    let waypointID: UUID
     let coordinate: CLLocationCoordinate2D
     let title: String?
     let subtitle: String?
 
     init(waypoint: Waypoint) {
+        waypointID = waypoint.id
         coordinate = waypoint.coordinate
         title = waypoint.name
         subtitle = "\(waypoint.latitude), \(waypoint.longitude)"

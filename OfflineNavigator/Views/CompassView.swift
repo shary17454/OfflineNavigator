@@ -5,7 +5,7 @@ struct CompassView: View {
     var yawRadians: Double
 
     private var displayDegrees: Double {
-        headingDegrees ?? yawRadians * 180 / .pi
+        NavigationMath.normalizedDegrees(headingDegrees ?? yawRadians * 180 / .pi)
     }
 
     var body: some View {

@@ -2,6 +2,11 @@ import CoreLocation
 import Foundation
 
 enum NavigationMath {
+    static func normalizedDegrees(_ degrees: Double) -> Double {
+        let normalized = degrees.truncatingRemainder(dividingBy: 360)
+        return normalized < 0 ? normalized + 360 : normalized
+    }
+
     static func distanceMeters(from origin: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D) -> CLLocationDistance {
         CLLocation(latitude: origin.latitude, longitude: origin.longitude)
             .distance(from: CLLocation(latitude: destination.latitude, longitude: destination.longitude))

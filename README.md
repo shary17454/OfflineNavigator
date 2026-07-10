@@ -5,7 +5,9 @@ Offline Navigator is a SwiftUI iOS app for saving, importing, exporting, sharing
 ## Features
 
 - SwiftUI app structure with an adaptive `NavigationSplitView`.
-- MapKit-backed map using `MKMapView` with saved coordinate annotations and user-location tracking.
+- MapKit-backed Apple map plus a coordinate grid that remains available without downloaded map tiles.
+- Large target guidance arrow and configurable proximity arrival alert.
+- Optional iCloud key-value backup and restore for saved coordinates.
 - CoreLocation integration for GPS position, location accuracy, and compass heading.
 - CoreMotion integration for device motion fallback/orientation support.
 - CoreData local persistence for saved coordinates.
@@ -30,7 +32,7 @@ Offline Navigator is a SwiftUI iOS app for saving, importing, exporting, sharing
 
 ## Offline Behavior
 
-The app stores saved coordinates locally using CoreData, so saved points remain available without a network connection. Distance and bearing calculations are performed on-device from GPS coordinates. Map tile availability still depends on MapKit caching and system map availability; the coordinate list, compass, bearing, and distance readout do not require online services.
+The app stores saved coordinates locally using CoreData, so saved points remain available without a network connection. Distance and bearing calculations are performed on-device from GPS coordinates. Apple map tiles depend on system availability, but Offline Grid mode, the coordinate list, compass, bearing, distance, and arrival alert do not require online services.
 
 ## Project Structure
 
@@ -58,13 +60,15 @@ The latest local verification passed with all unit tests succeeding.
 
 ## iCloud Backup
 
-iCloud/CloudKit backup is intentionally not enabled in source because it requires an Apple Developer Team, app entitlements, and a CloudKit container configured in Xcode. The app uses CoreData, so it is ready to be migrated to `NSPersistentCloudKitContainer` once signing and CloudKit capabilities are available.
+iCloud backup is implemented with `NSUbiquitousKeyValueStore` and is optional in Settings. A paid Apple Developer Team must provision the included key-value-store entitlement before App Store distribution. CoreData remains the primary local store, so navigation does not depend on iCloud availability.
 
 ## Release Notes
 
-Current version: `1.0`
+Current version: `1.1`
 
-- Initial SwiftUI offline coordinate navigation app.
+- Added a full offline coordinate grid independent of map tiles.
+- Added a large live guidance arrow and proximity arrival alert.
+- Added optional iCloud backup and restore.
 - Local CoreData coordinate storage.
 - GPX import/export.
 - ShareSheet map links and GPX sharing.

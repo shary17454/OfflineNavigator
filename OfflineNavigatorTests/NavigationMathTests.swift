@@ -14,4 +14,9 @@ final class NavigationMathTests: XCTestCase {
         XCTAssertEqual(NavigationMath.formattedDistance(250), "250 m")
         XCTAssertEqual(NavigationMath.formattedDistance(1250), "1.25 km")
     }
+
+    func testNormalizedDegreesWrapsBothDirections() {
+        XCTAssertEqual(NavigationMath.normalizedDegrees(450), 90, accuracy: 0.001)
+        XCTAssertEqual(NavigationMath.normalizedDegrees(-90), 270, accuracy: 0.001)
+    }
 }

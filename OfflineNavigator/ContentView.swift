@@ -7,12 +7,19 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(fetchRequest: Waypoint.fetchRequest()) private var waypoints: FetchedResults<Waypoint>
     @StateObject private var locationManager = LocationMotionManager()
+    @StateObject private var iCloudBackup = ICloudBackupService()
+
+    @AppStorage("mapDisplayMode") private var mapDisplayMode = MapDisplayMode.apple.rawValue
+    @AppStorage("proximityDistance") private var proximityDistance = 50.0
+    @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
 
     @State private var selectedWaypoint: Waypoint?
     @State private var showingAddWaypoint = false
     @State private var showingImporter = false
+    @State private var showingSettings = false
     @State private var shareItems: [Any] = []
     @State private var alertMessage: String?
+    @State private var alertedWaypointID: UUID?
 
     var body: some View {
         NavigationSplitView {
@@ -21,12 +28,14 @@ struct ContentView: View {
 
                 Section("Saved coordinates") {
                     ForEach(waypoints) { waypoint in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(waypoint.name)
-                                .font(.headline)
-                            Text("\(waypoint.latitude, specifier: "%.6f"), \(waypoint.longitude, specifier: "%.6f")")
-                                .font(.footnote.monospacedDigit())
-                                .foregroundStyle(.secondary)
+                        NavigationLink(value: waypoint) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(waypoint.name)
+                                    .font(.headline)
+                                Text("\(waypoint.latitude, specifier: "%.6f"), \(waypoint.longitude, specifier: "%.6f")")
+                                    .font(.footnote.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                         .tag(waypoint)
                         .swipeActions {
@@ -43,6 +52,12 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
+                        showingSettings = true
+                    } label: {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+
+                    Button {
                         showingImporter = true
                     } label: {
                         Label("Import GPX", systemImage: "square.and.arrow.down")
@@ -57,20 +72,27 @@ struct ContentView: View {
                 }
             }
         } detail: {
-            ZStack(alignment: .topTrailing) {
-                WaypointMapView(
-                    currentLocation: locationManager.currentLocation?.coordinate,
-                    waypoints: Array(waypoints),
-                    selectedWaypoint: selectedWaypoint
-                )
+            ZStack(alignment: .top) {
+                mapContent
                 .ignoresSafeArea()
 
-                CompassView(
-                    headingDegrees: compassDegrees,
-                    yawRadians: locationManager.deviceYaw
-                )
-                .padding(12)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                HStack(alignment: .top) {
+                    Picker("Map type", selection: $mapDisplayMode) {
+                        Image(systemName: "map").accessibilityLabel("Apple Map").tag(MapDisplayMode.apple.rawValue)
+                        Image(systemName: "square.grid.3x3").accessibilityLabel("Offline Grid").tag(MapDisplayMode.offline.rawValue)
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 112)
+
+                    Spacer(minLength: 12)
+
+                    CompassView(
+                        headingDegrees: compassDegrees,
+                        yawRadians: locationManager.deviceYaw
+                    )
+                    .padding(10)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                }
                 .padding()
             }
             .safeAreaInset(edge: .bottom) {
@@ -83,6 +105,15 @@ struct ContentView: View {
         .onDisappear {
             locationManager.stop()
         }
+        .onChange(of: selectedWaypoint?.id) {
+            alertedWaypointID = nil
+        }
+        .onChange(of: iCloudBackupEnabled) {
+            autoBackupIfEnabled()
+        }
+        .onReceive(locationManager.$currentLocation.compactMap { $0 }) { location in
+            checkProximity(from: location)
+        }
         .sheet(isPresented: $showingAddWaypoint) {
             AddWaypointView(location: locationManager.currentLocation) { name, note in
                 addCurrentLocation(name: name, note: note)
@@ -91,6 +122,16 @@ struct ContentView: View {
         .sheet(isPresented: Binding(get: { !shareItems.isEmpty }, set: { if !$0 { shareItems = [] } })) {
             ShareSheet(items: shareItems)
         }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView(
+                proximityDistance: $proximityDistance,
+                iCloudBackupEnabled: $iCloudBackupEnabled,
+                iCloudAvailable: iCloudBackup.isAvailable,
+                lastBackupDate: iCloudBackup.lastBackupDate,
+                onBackup: backupToICloud,
+                onRestore: restoreFromICloud
+            )
+        }
         .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.gpx, .xml, .data], allowsMultipleSelection: false) { result in
             importGPX(result)
         }
@@ -98,6 +139,23 @@ struct ContentView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(alertMessage ?? "")
+        }
+    }
+
+    @ViewBuilder
+    private var mapContent: some View {
+        if mapDisplayMode == MapDisplayMode.offline.rawValue {
+            OfflineGridMapView(
+                currentLocation: locationManager.currentLocation?.coordinate,
+                waypoints: Array(waypoints),
+                selectedWaypoint: selectedWaypoint
+            )
+        } else {
+            WaypointMapView(
+                currentLocation: locationManager.currentLocation?.coordinate,
+                waypoints: Array(waypoints),
+                selectedWaypoint: selectedWaypoint
+            )
         }
     }
 
@@ -114,6 +172,13 @@ struct ContentView: View {
             }
 
             Button {
+                showingAddWaypoint = true
+            } label: {
+                Label("Save Current", systemImage: "plus.circle.fill")
+            }
+            .disabled(locationManager.currentLocation == nil)
+
+            Button {
                 locationManager.requestAccess()
             } label: {
                 Label("Enable Location", systemImage: "location")
@@ -128,13 +193,13 @@ struct ContentView: View {
 
     private var actionBar: some View {
         VStack(spacing: 10) {
-            if let navigationReadout {
-                HStack(spacing: 16) {
-                    Label(navigationReadout.distance, systemImage: "point.topleft.down.curvedto.point.bottomright.up")
-                    Label(navigationReadout.bearing, systemImage: "safari")
-                }
-                .font(.subheadline.monospacedDigit())
-                .foregroundStyle(.secondary)
+            if let navigationReadout, let selectedWaypoint {
+                NavigationGuidanceView(
+                    waypointName: selectedWaypoint.name,
+                    distance: navigationReadout.distance,
+                    bearingDegrees: navigationReadout.bearingDegrees,
+                    headingDegrees: compassDegrees ?? 0
+                )
             }
 
             HStack(spacing: 12) {
@@ -168,7 +233,7 @@ struct ContentView: View {
         .background(.regularMaterial)
     }
 
-    private var navigationReadout: (distance: String, bearing: String)? {
+    private var navigationReadout: (distance: String, bearingDegrees: Double)? {
         guard let origin = locationManager.currentLocation?.coordinate, let destination = selectedWaypoint?.coordinate else {
             return nil
         }
@@ -178,7 +243,7 @@ struct ContentView: View {
         let meters = originLocation.distance(from: destinationLocation)
         return (
             NavigationMath.formattedDistance(meters),
-            "\(Int(NavigationMath.bearingDegrees(from: origin, to: destination).rounded()))°"
+            NavigationMath.bearingDegrees(from: origin, to: destination)
         )
     }
 
@@ -195,6 +260,7 @@ struct ContentView: View {
         do {
             try viewContext.save()
             selectedWaypoint = waypoint
+            autoBackupIfEnabled()
         } catch {
             viewContext.rollback()
             alertMessage = error.localizedDescription
@@ -204,6 +270,7 @@ struct ContentView: View {
     private func delete(_ waypoint: Waypoint) {
         viewContext.delete(waypoint)
         PersistenceController.shared.save()
+        autoBackupIfEnabled()
     }
 
     private func importGPX(_ result: Result<[URL], Error>) {
@@ -218,6 +285,7 @@ struct ContentView: View {
             let data = try Data(contentsOf: url)
             let imported = try GPXService.parse(data: data)
             try GPXService.importWaypoints(imported, into: viewContext)
+            autoBackupIfEnabled()
             alertMessage = "Imported \(imported.count) waypoint(s)."
         } catch {
             alertMessage = error.localizedDescription
@@ -241,6 +309,52 @@ struct ContentView: View {
         guard let url = selectedWaypoint?.appleMapsURL else { return }
         UIApplication.shared.open(url)
     }
+
+    private func checkProximity(from location: CLLocation) {
+        guard let waypoint = selectedWaypoint else { return }
+        let distance = location.distance(from: CLLocation(latitude: waypoint.latitude, longitude: waypoint.longitude))
+
+        if distance > proximityDistance * 1.5, alertedWaypointID == waypoint.id {
+            alertedWaypointID = nil
+        }
+
+        guard distance <= proximityDistance, alertedWaypointID != waypoint.id else { return }
+        alertedWaypointID = waypoint.id
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        alertMessage = "You are within \(Int(proximityDistance)) meters of \(waypoint.name)."
+    }
+
+    private func autoBackupIfEnabled() {
+        guard iCloudBackupEnabled, iCloudBackup.isAvailable else { return }
+        try? iCloudBackup.backup(currentWaypoints())
+    }
+
+    private func backupToICloud() {
+        do {
+            try iCloudBackup.backup(currentWaypoints())
+            alertMessage = "iCloud backup completed."
+        } catch {
+            alertMessage = error.localizedDescription
+        }
+    }
+
+    private func restoreFromICloud() {
+        do {
+            let count = try iCloudBackup.restore(into: viewContext)
+            alertMessage = count == 0 ? "All backed-up points are already on this device." : "Restored \(count) point(s) from iCloud."
+        } catch {
+            alertMessage = error.localizedDescription
+        }
+    }
+
+    private func currentWaypoints() -> [Waypoint] {
+        (try? viewContext.fetch(Waypoint.fetchRequest())) ?? []
+    }
+}
+
+private enum MapDisplayMode: String {
+    case apple
+    case offline
 }
 
 extension UTType {
