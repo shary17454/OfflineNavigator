@@ -1,0 +1,21 @@
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+*.moved-aside
+
+# Swift Package Manager
+.build/
+
+# macOS
+.DS_Store
+
+# Archives and generated packages
+*.xcarchive
+*.ipa
+*.zip
+
+# Temporary files
+*.tmp
+*.swp
