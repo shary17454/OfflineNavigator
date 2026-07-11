@@ -1,0 +1,9 @@
+{
+  "id" : "11fed5f5-f23c-4fac-9f5c-6c891df64451",
+  "targets" : [
+    {
+      "id" : "062d66e4-eaec-4b90-8462-66b70f484bec",
+      "name" : "OfflineNavigator"
+    }
+  ]
+}
