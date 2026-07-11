@@ -135,7 +135,7 @@ struct ContentView: View {
         .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.gpx, .xml, .data], allowsMultipleSelection: false) { result in
             importGPX(result)
         }
-        .alert("Offline Navigator", isPresented: Binding(get: { alertMessage != nil }, set: { if !$0 { alertMessage = nil } })) {
+        .alert("مدّل", isPresented: Binding(get: { alertMessage != nil }, set: { if !$0 { alertMessage = nil } })) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(alertMessage ?? "")
