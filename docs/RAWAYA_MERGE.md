@@ -3,7 +3,7 @@
 هذا المستودع يجمع الآن:
 
 1. **مدّل (OfflineNavigator)** — تطبيق iOS للملاحة بالإحداثيات دون اتصال.
-2. **رواية / Rawaya (`rawayah/`)** — منصة التراث العربي من Codex (API + Web + Admin + Flutter).
+2. **موروث / Mawrooth (سابقًا رواية) (`rawayah/`)** — منصة التراث العربي من Codex (API + Web + Admin + Flutter).
 3. **رواية iOS الأصلية (`Riwaya/`)** — تطبيق SwiftUI محلي للكتابة/القراءة دون اتصال، ودمج أفكاره في Flutter عبر شاشة **دفتر دون اتصال**.
 
 ## مصدر Codex

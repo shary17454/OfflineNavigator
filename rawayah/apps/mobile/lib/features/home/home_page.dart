@@ -27,15 +27,20 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('رواية')),
+      appBar: AppBar(title: const Text('موروث')),
       body: Directionality(
         textDirection: TextDirection.rtl,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const Text(
-              'رواية… ذاكرة التراث العربي',
+              'موروث… ذاكرة التراث العربي',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'منصة لحفظ وصون الموروث: شعر، قصص، كتب، ومساهماتك المحلية دون اتصال.',
+              style: TextStyle(fontSize: 15, height: 1.5),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -55,6 +60,28 @@ class _HomePageState extends State<HomePage> {
                 subtitle: const Text('اكتب واقرأ مساهماتك محليًا دون إنترنت'),
                 trailing: const Icon(Icons.chevron_left),
                 onTap: () => context.go('/offline'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: const Text('عن موروث'),
+                subtitle: const Text('الإصدار 0.1.0 — MVP'),
+                onTap: () {
+                  showAboutDialog(
+                    context: context,
+                    applicationName: 'موروث',
+                    applicationVersion: '0.1.0',
+                    applicationLegalese: 'منصة الموروث والتراث العربي',
+                    children: const [
+                      SizedBox(height: 12),
+                      Text(
+                        'موروث يجمع محتوى التراث مع دفتر محلي للمساهمات دون اتصال، استعدادًا للربط الكامل مع الخادم.',
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),

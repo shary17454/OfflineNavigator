@@ -10,10 +10,10 @@ import 'features/offline/offline_library_page.dart';
 import 'screens/placeholder_page.dart';
 
 void main() {
-  runApp(const ProviderScope(child: RawayaApp()));
+  runApp(const ProviderScope(child: MawroothApp()));
 }
 
-class RawayaRoutes {
+class MawroothRoutes {
   static const list = [
     '/home',
     '/search',
@@ -96,12 +96,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      ...RawayaRoutes.list
+      ...MawroothRoutes.list
           .where((path) => !['/home', '/search', '/auth', '/offline'].contains(path))
           .map(
             (path) => GoRoute(
               path: path,
-              builder: (context, state) => PlaceholderPage(title: RawayaRoutes.title(path)),
+              builder: (context, state) => PlaceholderPage(title: MawroothRoutes.title(path)),
             ),
           ),
     ],
@@ -109,14 +109,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class RawayaApp extends ConsumerWidget {
-  const RawayaApp({super.key});
+class MawroothApp extends ConsumerWidget {
+  const MawroothApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
-      title: 'رواية',
+      title: 'موروث',
       routerConfig: router,
       theme: ThemeData(
         fontFamily: 'Tajawal',
@@ -139,7 +139,7 @@ class SplashPage extends StatelessWidget {
       body: Center(
         child: FilledButton(
           onPressed: () => context.goNamed('home'),
-          child: const Text('رواية… ذاكرة التراث العربي'),
+          child: const Text('موروث… ذاكرة التراث العربي'),
         ),
       ),
     );

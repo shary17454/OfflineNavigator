@@ -1,7 +1,8 @@
 #!/bin/sh
 set -euo pipefail
 
-cd "$CI_PRIMARY_REPOSITORY_PATH/apps/mobile"
+APP_DIR="${CI_PRIMARY_REPOSITORY_PATH}/rawayah/apps/mobile"
+cd "$APP_DIR"
 
 if [ -d "$HOME/flutter/bin" ]; then
   export PATH="$HOME/flutter/bin:$PATH"

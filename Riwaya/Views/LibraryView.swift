@@ -81,7 +81,7 @@ struct LibraryView: View {
                     }
                 }
             }
-            .navigationTitle("رواية")
+            .navigationTitle("موروث")
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -131,7 +131,7 @@ struct LibraryView: View {
                 .font(.system(.largeTitle, design: .serif).weight(.bold))
                 .foregroundStyle(RiwayaTheme.mist)
 
-            Text("دفتر محلي مكمّل لمنصة رواية التراثية: اكتب واقرأ مساهماتك دون اتصال.")
+            Text("دفتر محلي مكمّل لمنصة موروث التراثية: اكتب واقرأ مساهماتك دون اتصال.")
                 .font(.subheadline)
                 .foregroundStyle(RiwayaTheme.mist.opacity(0.75))
         }

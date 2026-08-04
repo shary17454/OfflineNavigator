@@ -119,7 +119,7 @@ struct NovelDetailView: View {
         .sheet(isPresented: $showingShare) {
             ShareSheet(items: shareItems)
         }
-        .alert("رواية", isPresented: Binding(get: { alertMessage != nil }, set: { if !$0 { alertMessage = nil } })) {
+        .alert("موروث", isPresented: Binding(get: { alertMessage != nil }, set: { if !$0 { alertMessage = nil } })) {
             Button("حسنًا", role: .cancel) {}
         } message: {
             Text(alertMessage ?? "")

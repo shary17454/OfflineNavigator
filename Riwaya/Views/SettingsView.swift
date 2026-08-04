@@ -34,7 +34,7 @@ struct SettingsView: View {
                 }
 
                 Section("حول التطبيق") {
-                    LabeledContent("التطبيق", value: "رواية")
+                    LabeledContent("التطبيق", value: "موروث")
                     LabeledContent("الإصدار", value: "1.0")
                     Text("تطبيق شخصي لكتابة وقراءة الروايات محليًا على جهازك، دون حساب ودون اتصال.")
                         .font(.footnote)
