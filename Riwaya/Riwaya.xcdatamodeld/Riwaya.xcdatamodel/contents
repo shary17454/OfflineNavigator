@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Novel" representedClassName="Novel" syncable="YES">
+        <attribute name="authorName" optional="NO" attributeType="String"/>
+        <attribute name="coverHue" optional="NO" attributeType="Double" defaultValueString="0.48" usesScalarValueType="YES"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="genre" optional="NO" attributeType="String"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isFavorite" optional="NO" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="lastOpenedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="lastReadChapterID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastReadOffset" optional="NO" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="synopsis" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="NO" attributeType="String"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="chapters" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Chapter" inverseName="novel" inverseEntity="Chapter"/>
+    </entity>
+    <entity name="Chapter" representedClassName="Chapter" syncable="YES">
+        <attribute name="body" optional="NO" attributeType="String"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="orderIndex" optional="NO" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="title" optional="NO" attributeType="String"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="wordCount" optional="NO" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="novel" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Novel" inverseName="chapters" inverseEntity="Novel"/>
+    </entity>
+    <elements>
+        <element name="Novel" positionX="-63" positionY="-18" width="128" height="239"/>
+        <element name="Chapter" positionX="160" positionY="-18" width="128" height="163"/>
+    </elements>
+</model>

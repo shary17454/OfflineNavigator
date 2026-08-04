@@ -1,4 +1,17 @@
-# Offline Navigator
+# Apps in this repository
+
+This repository contains two independent SwiftUI iOS apps:
+
+| App | Project | Bundle ID |
+| --- | --- | --- |
+| **مدّل** (Offline Navigator) | `OfflineNavigator.xcodeproj` | `com.shary17454.OfflineCoordinateNavigator` |
+| **رواية** (Riwaya) | `Riwaya.xcodeproj` | `com.shary17454.Riwaya` |
+
+See [`Riwaya/README.md`](Riwaya/README.md) for the novel writing/reading app.
+
+---
+
+# Offline Navigator (مدّل)
 
 Offline Navigator is a SwiftUI iOS app for saving, importing, exporting, sharing, and navigating to coordinates with minimal network dependence. It is designed for field use where users need a local coordinate database, a map view, a compass readout, GPX interoperability, and quick sharing through the native iOS share sheet.
 
