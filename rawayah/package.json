@@ -1,0 +1,27 @@
+{
+  "name": "rawaya-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "npm@10.5.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev:api & npm run dev:web & npm run dev:admin",
+    "dev:api": "npm run -w @rawaya/api dev",
+    "dev:web": "npm run -w @rawaya/web dev",
+    "dev:admin": "npm run -w @rawaya/admin dev",
+    "build": "npm run build:api && npm run build:web && npm run build:admin",
+    "build:api": "npm run -w @rawaya/api build",
+    "build:web": "npm run -w @rawaya/web build",
+    "build:admin": "npm run -w @rawaya/admin build",
+    "test": "npm run test:api && npm run test:web && npm run test:admin",
+    "test:api": "npm run -w @rawaya/api test",
+    "test:web": "WATCHMAN_DISABLE=1 CHOKIDAR_USEPOLLING=1 npm run -w @rawaya/web test -- --passWithNoTests --watchman=false",
+    "test:admin": "WATCHMAN_DISABLE=1 CHOKIDAR_USEPOLLING=1 npm run -w @rawaya/admin test -- --passWithNoTests --watchman=false",
+    "lint": "npm run -w @rawaya/api lint && npm run -w @rawaya/web lint && npm run -w @rawaya/admin lint",
+    "docker:dev": "docker-compose up -d",
+    "docker:prod": "docker-compose -f docker-compose.production.yml up -d"
+  }
+}

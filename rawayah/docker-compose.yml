@@ -1,0 +1,54 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: rawaya
+      POSTGRES_PASSWORD: rawaya
+      POSTGRES_DB: rawaya
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  api:
+    build: ./apps/api
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://rawaya:rawaya@postgres:5432/rawaya
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: change-me
+      JWT_REFRESH_SECRET: change-me-refresh
+      PORT: 4000
+      NODE_ENV: development
+    ports:
+      - "4000:4000"
+    command: sh -c "npx prisma migrate deploy && npm run start:dev"
+
+  web:
+    build: ./apps/web
+    depends_on:
+      - api
+    environment:
+      NEXT_PUBLIC_API_URL: http://api:4000/api
+    ports:
+      - "3001:3000"
+
+  admin:
+    build: ./apps/admin
+    depends_on:
+      - api
+    environment:
+      NEXT_PUBLIC_API_URL: http://api:4000/api
+    ports:
+      - "3002:3002"
+
+volumes:
+  postgres_data:

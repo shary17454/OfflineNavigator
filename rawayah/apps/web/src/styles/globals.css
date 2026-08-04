@@ -1,0 +1,53 @@
+:root {
+  --sand: #d7ba8a;
+  --ink: #2b1d14;
+  --paper: #fdf7ed;
+  --gold: #b68843;
+  --dark: #20130b;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Arial', 'Tahoma', sans-serif;
+  background: linear-gradient(180deg, var(--paper), #f6ebd9);
+  color: var(--ink);
+  direction: rtl;
+}
+
+.app-shell {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.site-header {
+  background: linear-gradient(90deg, var(--sand), #efd0a8);
+  color: var(--dark);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 1rem;
+  font-size: 1.3rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.home, .search-page {
+  background: #fffdf8;
+  border: 1px solid #e0ccb0;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+input {
+  min-width: 260px;
+  padding: 0.6rem;
+}
+
+button {
+  margin-right: 0.5rem;
+  padding: 0.6rem 1rem;
+}

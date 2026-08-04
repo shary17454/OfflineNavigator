@@ -1,13 +1,12 @@
 # Apps in this repository
 
-This repository contains two independent SwiftUI iOS apps:
-
-| App | Project | Bundle ID |
+| App | Path / Project | Notes |
 | --- | --- | --- |
-| **مدّل** (Offline Navigator) | `OfflineNavigator.xcodeproj` | `com.shary17454.OfflineCoordinateNavigator` |
-| **رواية** (Riwaya) | `Riwaya.xcodeproj` | `com.shary17454.Riwaya` |
+| **مدّل** | `OfflineNavigator.xcodeproj` | Offline coordinate navigator |
+| **موروث (Codex platform)** | `rawayah/` | Heritage platform Mawrooth from `my-codex` (Nest/Next/Flutter) |
+| **موروث (SwiftUI offline)** | `Riwaya.xcodeproj` | Native iOS offline companion for Mawrooth |
 
-See [`Riwaya/README.md`](Riwaya/README.md) for the novel writing/reading app.
+See [`docs/RAWAYA_MERGE.md`](docs/RAWAYA_MERGE.md), [`docs/MAWROOTH_XCODE_CLOUD.md`](docs/MAWROOTH_XCODE_CLOUD.md), and [`rawayah/README.md`](rawayah/README.md).
 
 ---
 

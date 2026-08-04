@@ -81,7 +81,7 @@ struct LibraryView: View {
                     }
                 }
             }
-            .navigationTitle("رواية")
+            .navigationTitle("موروث")
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -127,11 +127,11 @@ struct LibraryView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("مكتبتك")
+            Text("مكتبتك الشخصية")
                 .font(.system(.largeTitle, design: .serif).weight(.bold))
                 .foregroundStyle(RiwayaTheme.mist)
 
-            Text("اكتب رواياتك واقرأها دون اتصال، بفصول وتقدم قراءة محلي.")
+            Text("دفتر محلي مكمّل لمنصة موروث التراثية: اكتب واقرأ مساهماتك دون اتصال.")
                 .font(.subheadline)
                 .foregroundStyle(RiwayaTheme.mist.opacity(0.75))
         }
