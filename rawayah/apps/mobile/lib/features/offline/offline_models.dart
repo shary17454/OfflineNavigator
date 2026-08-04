@@ -86,7 +86,7 @@ class OfflineWork {
 }
 
 class OfflineLibraryStore {
-  static const _key = 'mawrooth_offline_works_v1';
+  static const _key = 'rawaya_offline_works_v1';
 
   Future<List<OfflineWork>> loadWorks() async {
     final prefs = await SharedPreferences.getInstance();
@@ -119,7 +119,7 @@ class OfflineLibraryStore {
       title: 'ظل على الرمال',
       authorName: 'مساهمة تجريبية',
       genre: 'قصة',
-      synopsis: 'نص تجريبي محلي للقراءة والكتابة دون اتصال داخل تطبيق موروث.',
+      synopsis: 'نص تجريبي محلي للقراءة والكتابة دون اتصال داخل تطبيق رواية التراث.',
       updatedAt: DateTime.now(),
       isFavorite: true,
       chapters: [

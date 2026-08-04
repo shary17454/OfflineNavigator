@@ -1,8 +1,10 @@
-# موروث (Mawrooth)
+# رواية التراث (Rawaya)
 
-منصة رقمية عربية لحفظ وصون الموروث والتراث العربي والبدوي.
+منصة رقمية عربية لحفظ وصون التراث العربي والبدوي.
 
-> تم دمج هذا المجلد من `shary17454/my-codex` (فرع `codex/rawaya-mvp-xcode-cloud-proper`) إلى هذا المستودع، مع إضافة **دفتر دون اتصال** في تطبيق Flutter مستوحى من تطبيق SwiftUI المحلي.
+> المسار: `rawayah/`  
+> Bundle ID المسجّل في Apple: `com.shary17454.rawaya`  
+> اسم App Store Connect: **رواية التراث** (App ID `6797734164`)
 
 ## المتطلبات
 - Node.js 20+
@@ -32,6 +34,11 @@ flutter run
 
 من الشاشة الرئيسية يمكن فتح **دفتر دون اتصال** لكتابة وقراءة المساهمات محليًا بدون إنترنت.
 
+## Xcode Cloud
+راجع `../docs/RAWAYA_XCODE_CLOUD.md`.
+
+Workspace: `apps/mobile/ios/Runner.xcworkspace` — Scheme: `Runner`
+
 ## المتغيرات
 - `DATABASE_URL`
 - `JWT_SECRET`
@@ -52,23 +59,3 @@ flutter run
 - `npm run docker:prod`
 - `cd apps/mobile && flutter test`
 - `cd apps/mobile && flutter build ios --release --no-codesign`
-
-## GitHub و Xcode Cloud
-
-ملفات Xcode Cloud موجودة في:
-
-- `apps/mobile/ios/ci_scripts/ci_post_clone.sh`
-- `apps/mobile/ios/ci_scripts/ci_pre_xcodebuild.sh`
-
-## قواعد البيانات الأولية في MVP
-- المستخدمون والصلاحيات
-- الشعراء والقصائد
-- القصص
-- الكتب
-- الخيل
-- الإبل
-- الصقور
-- كلاب الصيد
-- الأسئلة والتعليقات والمفضلة
-- البحث والسجلات
-- دفتر المساهمات المحلية دون اتصال (على الجهاز)
