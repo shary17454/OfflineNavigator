@@ -1,0 +1,904 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContentStatus {
+  DRAFT
+  SUBMITTED
+  NEEDS_REVISION
+  VERIFIED
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+  HIDDEN
+}
+
+enum VerificationLevel {
+  VERIFIED
+  PARTIAL
+  ORAL
+  DISPUTED
+  INCOMPLETE
+  UNDER_REVIEW
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  DELETED
+}
+
+enum ContentType {
+  POEM
+  STORY
+  BOOK
+  HISTORICAL_EVENT
+  TRIBE
+  PLACE
+  PROVERB
+  VOCABULARY_TERM
+  HORSE
+  CAMEL
+  FALCON
+  HUNTING_DOG
+  QUESTION
+  COMMENT
+}
+
+enum SearchSource {
+  KEYWORD
+  SUGGESTION
+  TAG
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  status        UserStatus @default(ACTIVE)
+  isEmailVerified Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+  lastLoginAt   DateTime?
+  profile       Profile?
+  comments      Comment[]
+  favorites     Favorite[]
+  follows       Follow[]
+  readingLists  ReadingList[]
+  ratings       Rating[]
+  questions     Question[]
+  answers       Answer[]
+  notifications Notification[]
+  userRoles     UserRole[]
+  refreshTokens RefreshToken[]
+  subscriptions Subscription[]
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  fullName    String?
+  displayName String?
+  avatar      String?
+  bio         String?
+  phoneNumber String?
+  location    String?
+  preferredLocale String @default("ar")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  nameAr      String
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userRoles   UserRole[]
+  rolePermissions RolePermission[]
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  nameAr      String
+  scope       String
+  createdAt   DateTime @default(now())
+  rolePermissions RolePermission[]
+}
+
+model UserRole {
+  id      String @id @default(cuid())
+  userId  String
+  roleId  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model Poet {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  fullName      String
+  knownAs       String?
+  imageUrl      String?
+  birthDate     String?
+  deathDate     String?
+  region        String?
+  era           String?
+  biography     String?
+  notableEvents String?
+  summary       String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status        ContentStatus @default(DRAFT)
+  sourceNotes   String?
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+  createdBy     String?
+  reviewedBy    String?
+  publishedBy   String?
+
+  poems         Poem[]
+  stories       Story[]
+  @@index([fullName])
+}
+
+model Poem {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  summary       String?
+  body          String
+  status        ContentStatus @default(DRAFT)
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  language      String   @default("ar")
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+  createdBy     String?
+  reviewedBy    String?
+  publishedBy   String?
+  poetId        String
+  topic         String?
+  era           String?
+  region        String?
+  tribe         String?
+  meter         String?
+  occasion      String?
+  poemStory     String?
+  explanation   String?
+  difficultyWords Json?
+  imageUrl      String?
+  isOfficial    Boolean @default(true)
+  viewCount     Int @default(0)
+  saveCount     Int @default(0)
+  ratingAverage Float? @default(0)
+
+  poet          Poet @relation(fields: [poetId], references: [id], onDelete: Cascade)
+  tags          ContentTag[]
+  sources       ContentSource[]
+  comments      Comment[]
+  revisions     ContentRevision[]
+  audioTracks   AudioTrack[]
+  videos        Video[]
+}
+
+model Story {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  title      String
+  summary    String?
+  body       String
+  narrator   String?
+  researcher String?
+  characters Json?
+  location   String?
+  era        String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status     ContentStatus @default(DRAFT)
+  language   String @default("ar")
+  publishedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+  createdBy  String?
+  reviewedBy String?
+  publishedBy String?
+  viewCount  Int @default(0)
+  saveCount  Int @default(0)
+
+  tags       ContentTag[]
+  sources    ContentSource[]
+  comments   Comment[]
+}
+
+model HistoricalEvent {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  summary         String?
+  body            String
+  era             String?
+  region          String?
+  status          ContentStatus @default(DRAFT)
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  language        String @default("ar")
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+  createdBy       String?
+  reviewedBy      String?
+  publishedBy     String?
+
+  sources         ContentSource[]
+}
+
+model Tribe {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  summary         String?
+  body            String
+  region          String?
+  status          ContentStatus @default(DRAFT)
+  verificationLevel VerificationLevel @default(DISPUTED)
+  sensitive       Boolean @default(true)
+  allowComments   Boolean @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+  createdBy       String?
+  reviewedBy      String?
+  publishedBy     String?
+
+  sources         ContentSource[]
+}
+
+model Place {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  description     String?
+  latitude        Float?
+  longitude       Float?
+  mediaUrl        String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status          ContentStatus @default(DRAFT)
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+  createdBy       String?
+  reviewedBy      String?
+  publishedBy     String?
+
+  sources         ContentSource[]
+}
+
+model Book {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  summary       String?
+  body          String?
+  status        ContentStatus @default(DRAFT)
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  language      String @default("ar")
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+  createdBy     String?
+  reviewedBy    String?
+  publishedBy   String?
+  author        String?
+  editor        String?
+  publisher     String?
+  publishedYear String?
+  edition       String?
+  pages         Int?
+  isbn          String?
+  rights        String?
+  purchaseUrl   String?
+
+  sources       ContentSource[]
+}
+
+model Manuscript {
+  id         String   @id @default(cuid())
+  title      String
+  slug       String   @unique
+  summary    String?
+  content    String?
+  status     ContentStatus @default(DRAFT)
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+  sourceId   String?
+}
+
+model Proverb {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  phrase    String
+  explanation String
+  story     String?
+  region    String?
+  usage     String?
+  language  String @default("ar")
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status    ContentStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdBy String?
+  reviewedBy String?
+  publishedBy String?
+  sources ContentSource[]
+}
+
+model VocabularyTerm {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  term      String
+  pronunciation String?
+  meaning   String
+  usage     String?
+  example   String?
+  dialect   String?
+  language  String @default("ar")
+  audioUrl  String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status    ContentStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdBy String?
+  reviewedBy String?
+  publishedBy String?
+  sources   ContentSource[]
+}
+
+model Horse {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  name       String
+  summary    String?
+  description String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status     ContentStatus @default(DRAFT)
+  language   String @default("ar")
+  publishedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+  createdBy  String?
+  reviewedBy String?
+  publishedBy String?
+  breeds     HorseBreed[]
+}
+
+model HorseBreed {
+  id             String   @id @default(cuid())
+  horseId        String
+  name           String
+  origin         String?
+  traitSummary   String?
+  usage          String?
+  photos         String?
+
+  horse Horse @relation(fields: [horseId], references: [id], onDelete: Cascade)
+  sources ContentSource[]
+}
+
+model Camel {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  summary        String?
+  description    String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status         ContentStatus @default(DRAFT)
+  language       String @default("ar")
+  publishedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt      DateTime?
+  createdBy      String?
+  reviewedBy     String?
+  publishedBy    String?
+  breeds         CamelBreed[]
+}
+
+model CamelBreed {
+  id           String   @id @default(cuid())
+  camelId      String
+  name         String
+  origin       String?
+  traits       String?
+  usage        String?
+  photos       String?
+
+  camel Camel @relation(fields: [camelId], references: [id], onDelete: Cascade)
+  sources ContentSource[]
+}
+
+model Falcon {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  name       String
+  summary    String?
+  description String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status     ContentStatus @default(DRAFT)
+  language   String @default("ar")
+  publishedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+  createdBy  String?
+  reviewedBy String?
+  publishedBy String?
+  breeds     FalconBreed[]
+}
+
+model FalconBreed {
+  id         String   @id @default(cuid())
+  falconId   String
+  name       String
+  origin     String?
+  traits     String?
+  usage      String?
+  photos     String?
+
+  falcon Falcon @relation(fields: [falconId], references: [id], onDelete: Cascade)
+}
+
+model HuntingArticle {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  summary         String?
+  body            String
+  status          ContentStatus @default(DRAFT)
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  region          String?
+  era             String?
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+  createdBy       String?
+  reviewedBy      String?
+  publishedBy     String?
+  updatedByLaw     String?
+}
+
+model HuntingDogBreed {
+  id         String @id @default(cuid())
+  name       String
+  origin     String?
+  traits     String?
+  usage      String?
+  imageUrl   String?
+}
+
+model HuntingDogArticle {
+  id      String   @id @default(cuid())
+  slug    String   @unique
+  title   String
+  summary String?
+  body    String
+  breedId String?
+  status  ContentStatus @default(DRAFT)
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdBy String?
+  reviewedBy String?
+  publishedBy String?
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  section     String
+  orderIndex  Int @default(0)
+  isVisible   Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  contentTags ContentTag[]
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  contentTags ContentTag[]
+}
+
+model ContentTag {
+  id         String @id @default(cuid())
+  contentType ContentType
+  contentId  String
+  tagId      String
+  createdAt  DateTime @default(now())
+
+  tag        Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@index([contentType, contentId])
+}
+
+model Source {
+  id          String   @id @default(cuid())
+  title       String
+  author      String?
+  editor      String?
+  publisher   String?
+  edition     String?
+  pageNumber  String?
+  publicationYear Int?
+  link        String?
+  sourceType  String
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean @default(true)
+  contentSources ContentSource[]
+}
+
+model ContentSource {
+  id         String @id @default(cuid())
+  contentType ContentType
+  contentId   String
+  sourceId    String
+  createdAt   DateTime @default(now())
+
+  source Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([contentType, contentId])
+}
+
+model MediaFile {
+  id          String @id @default(cuid())
+  contentType ContentType
+  contentId   String
+  mimeType    String
+  url         String
+  size        Int
+  originalName String
+  storageKey  String
+  uploadedBy  String?
+  isPrivate   Boolean @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([contentType, contentId])
+}
+
+model AudioTrack {
+  id          String @id @default(cuid())
+  contentType ContentType
+  contentId   String
+  title       String
+  narrator    String?
+  fileUrl     String
+  durationMs  Int?
+  license     String?
+  isDownloadable Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Video {
+  id          String @id @default(cuid())
+  contentType ContentType
+  contentId   String
+  title       String
+  description String?
+  posterUrl   String?
+  durationMs  Int?
+  fileUrl     String
+  subtitleUrl String?
+  license     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Comment {
+  id         String @id @default(cuid())
+  contentType ContentType
+  contentId  String
+  userId     String
+  body       String
+  isHidden   Boolean @default(false)
+  isDeleted  Boolean @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId String?
+  parent   Comment? @relation("CommentThread", fields: [parentId], references: [id], onDelete: SetNull)
+  replies  Comment[] @relation("CommentThread")
+  reportCounts CommentReport[]
+
+  @@index([contentType, contentId])
+}
+
+model CommentReport {
+  id        String @id @default(cuid())
+  commentId String
+  reporterId String
+  reason    String
+  details   String?
+  isResolved Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  comment  Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporter User    @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+}
+
+model ContentReport {
+  id          String @id @default(cuid())
+  contentType ContentType
+  contentId   String
+  reporterId  String
+  reason      String
+  details     String?
+  status      ContentStatus @default(SUBMITTED)
+  createdAt   DateTime @default(now())
+
+  reporter User @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  @@index([contentType, contentId])
+}
+
+model Question {
+  id          String @id @default(cuid())
+  title       String
+  category    String
+  description String
+  imageUrl    String?
+  sourceId    String?
+  status      String @default("new")
+  createdBy   String
+  acceptedAnswerId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  answers     Answer[]
+}
+
+model Answer {
+  id          String @id @default(cuid())
+  questionId  String
+  userId      String
+  body        String
+  isOfficial  Boolean @default(false)
+  isPreferred Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  id          String @id @default(cuid())
+  userId      String
+  contentType ContentType
+  contentId   String
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, contentType, contentId])
+}
+
+model Follow {
+  id        String @id @default(cuid())
+  followerId String
+  targetType String
+  targetId  String
+
+  follower User @relation(fields: [followerId], references: [id], onDelete: Cascade)
+  @@unique([followerId, targetType, targetId])
+}
+
+model ReadingList {
+  id          String @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  isPublic    Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items ReadingListItem[]
+}
+
+model ReadingListItem {
+  id            String @id @default(cuid())
+  readingListId String
+  contentType   ContentType
+  contentId     String
+  position      Int @default(0)
+
+  readingList ReadingList @relation(fields: [readingListId], references: [id], onDelete: Cascade)
+  @@unique([readingListId, contentType, contentId])
+}
+
+model Rating {
+  id          String @id @default(cuid())
+  userId      String
+  contentType ContentType
+  contentId   String
+  value       Int
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, contentType, contentId])
+}
+
+model Notification {
+  id        String @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  isRead    Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id       String @id @default(cuid())
+  userId   String
+  planId   String
+  status   String
+  startsAt DateTime
+  endsAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id          String @id @default(cuid())
+  code        String @unique
+  nameAr      String
+  priceCents  Int
+  periodDays  Int
+  features    Json
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  subscriptions Subscription[]
+}
+
+model Payment {
+  id          String @id @default(cuid())
+  userId      String
+  subscriptionId String?
+  provider    String
+  providerRef String?
+  amountCents Int
+  currency    String @default("SAR")
+  status      String
+  paidAt      DateTime?
+  payload     Json?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SearchLog {
+  id        String   @id @default(cuid())
+  queryText String
+  source    SearchSource @default(KEYWORD)
+  resultCount Int @default(0)
+  userId    String?
+  createdAt DateTime @default(now())
+}
+
+model ContentView {
+  id          String @id @default(cuid())
+  contentType ContentType
+  contentId   String
+  userId      String?
+  visitedAt   DateTime @default(now())
+  @@index([contentType, contentId])
+}
+
+model ContentRevision {
+  id            String @id @default(cuid())
+  contentType   ContentType
+  contentId     String
+  previousBody  String?
+  currentBody   String?
+  createdBy     String?
+  reviewedBy    String?
+  reviewNotes   String?
+  createdAt     DateTime @default(now())
+
+  @@index([contentType, contentId])
+}
+
+model ModerationLog {
+  id          String @id @default(cuid())
+  actorId     String?
+  action      String
+  entityType  String
+  entityId    String
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+}
+
+model AuditLog {
+  id          String @id @default(cuid())
+  actorId     String?
+  action      String
+  entity      String
+  entityId    String?
+  metadata    Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+}
+
+model AppSetting {
+  id    String   @id @default(cuid())
+  key   String   @unique
+  value Json
+  scope String   @default("global")
+  updatedAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+  userId      String
+  tokenHash   String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime @default(now())
+  replacedBy  String?
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,71 @@
+name: Rawaya CI
+
+on:
+  push:
+    paths:
+      - "rawayah/**"
+      - "apps/**"
+      - "packages/**"
+      - "package*.json"
+      - ".github/workflows/rawaya-ci.yml"
+  pull_request:
+    paths:
+      - "rawayah/**"
+      - "apps/**"
+      - "packages/**"
+      - "package*.json"
+
+jobs:
+  api-web-admin:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: rawaya
+          POSTGRES_PASSWORD: rawaya
+          POSTGRES_DB: rawaya
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rawaya"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    env:
+      DATABASE_URL: postgresql://rawaya:rawaya@localhost:5432/rawaya
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-access-secret
+      JWT_REFRESH_SECRET: ci-refresh-secret
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate --schema apps/api/prisma/schema.prisma
+      - run: npm run build
+      - run: npm run test
+
+  mobile:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - working-directory: apps/mobile
+        run: flutter pub get
+      - working-directory: apps/mobile
+        run: flutter test
+      - working-directory: apps/mobile
+        run: flutter build ios --release --no-codesign
