@@ -1,5 +1,7 @@
 # Apps in this repository
 
+> Engineering agents and contributors must start with [`AGENTS.md`](AGENTS.md), then use the indexed project documentation in [`docs/README.md`](docs/README.md).
+
 | App | Path / Project | Notes |
 | --- | --- | --- |
 | **مدّل** | `OfflineNavigator.xcodeproj` | Offline coordinate navigator |
