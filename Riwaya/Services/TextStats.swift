@@ -29,21 +29,6 @@ enum TextStats {
         max(1, Int(ceil(Double(max(wordCount, 1)) / Double(wordsPerMinute))))
     }
 
-    static func arabicCountLabel(_ count: Int, singular: String, dual: String, plural: String) -> String {
-        switch count {
-        case 0:
-            return "لا يوجد"
-        case 1:
-            return singular
-        case 2:
-            return dual
-        case 3...10:
-            return "\(count) \(plural)"
-        default:
-            return "\(count) \(singular.replacingOccurrences(of: "فصل", with: "فصلًا").replacingOccurrences(of: "كلمة", with: "كلمة"))"
-        }
-    }
-
     static func chaptersLabel(_ count: Int) -> String {
         switch count {
         case 0: return "بدون فصول"

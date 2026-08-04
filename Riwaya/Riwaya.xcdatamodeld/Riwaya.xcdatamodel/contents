@@ -16,11 +16,11 @@
         <relationship name="chapters" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Chapter" inverseName="novel" inverseEntity="Chapter"/>
     </entity>
     <entity name="Chapter" representedClassName="Chapter" syncable="YES">
-        <attribute name="body" optional="NO" attributeType="String"/>
+        <attribute name="body" optional="NO" attributeType="String" defaultValueString=""/>
         <attribute name="createdAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="NO" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="orderIndex" optional="NO" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="title" optional="NO" attributeType="String"/>
+        <attribute name="title" optional="NO" attributeType="String" defaultValueString=""/>
         <attribute name="updatedAt" optional="NO" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="wordCount" optional="NO" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="novel" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Novel" inverseName="chapters" inverseEntity="Novel"/>
