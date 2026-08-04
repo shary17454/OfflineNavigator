@@ -27,19 +27,19 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('موروث')),
+      appBar: AppBar(title: const Text('رواية التراث')),
       body: Directionality(
         textDirection: TextDirection.rtl,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const Text(
-              'موروث… ذاكرة التراث العربي',
+              'رواية… ذاكرة التراث العربي',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
-              'منصة لحفظ وصون الموروث: شعر، قصص، كتب، ومساهماتك المحلية دون اتصال.',
+              'منصة لحفظ وصون التراث: شعر، قصص، كتب، ومساهماتك المحلية دون اتصال.',
               style: TextStyle(fontSize: 15, height: 1.5),
             ),
             const SizedBox(height: 12),
@@ -66,18 +66,18 @@ class _HomePageState extends State<HomePage> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.info_outline),
-                title: const Text('عن موروث'),
+                title: const Text('عن رواية التراث'),
                 subtitle: const Text('الإصدار 0.1.0 — MVP'),
                 onTap: () {
                   showAboutDialog(
                     context: context,
-                    applicationName: 'موروث',
+                    applicationName: 'رواية التراث',
                     applicationVersion: '0.1.0',
-                    applicationLegalese: 'منصة الموروث والتراث العربي',
+                    applicationLegalese: 'منصة رواية التراث العربي',
                     children: const [
                       SizedBox(height: 12),
                       Text(
-                        'موروث يجمع محتوى التراث مع دفتر محلي للمساهمات دون اتصال، استعدادًا للربط الكامل مع الخادم.',
+                        'رواية التراث تجمع محتوى التراث مع دفتر محلي للمساهمات دون اتصال، استعدادًا للربط الكامل مع الخادم.',
                       ),
                     ],
                   );

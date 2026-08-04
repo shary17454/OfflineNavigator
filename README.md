@@ -3,10 +3,10 @@
 | App | Path / Project | Notes |
 | --- | --- | --- |
 | **مدّل** | `OfflineNavigator.xcodeproj` | Offline coordinate navigator |
-| **موروث (Codex platform)** | `rawayah/` | Heritage platform Mawrooth from `my-codex` (Nest/Next/Flutter) |
-| **موروث (SwiftUI offline)** | `Riwaya.xcodeproj` | Native iOS offline companion for Mawrooth |
+| **رواية التراث (Codex platform)** | `rawayah/` | Rawaya heritage platform from `my-codex` — ASC app رواية التراث / `com.shary17454.rawaya` |
+| **رواية (SwiftUI offline companion)** | `Riwaya.xcodeproj` | Native iOS offline companion |
 
-See [`docs/RAWAYA_MERGE.md`](docs/RAWAYA_MERGE.md), [`docs/MAWROOTH_XCODE_CLOUD.md`](docs/MAWROOTH_XCODE_CLOUD.md), and [`rawayah/README.md`](rawayah/README.md).
+See [`docs/RAWAYA_MERGE.md`](docs/RAWAYA_MERGE.md), [`docs/RAWAYA_XCODE_CLOUD.md`](docs/RAWAYA_XCODE_CLOUD.md), and [`rawayah/README.md`](rawayah/README.md).
 
 ---
 
