@@ -92,10 +92,16 @@ Future<void> _captureDevice(
 
 void main() {
   setUpAll(() async {
-    final fontLoader = FontLoader('Tajawal')
+    final tajawalLoader = FontLoader('Tajawal')
       ..addFont(rootBundle.load('assets/fonts/Tajawal-Regular.ttf'))
       ..addFont(rootBundle.load('assets/fonts/Tajawal-Bold.ttf'));
-    await fontLoader.load();
+    final materialIconsLoader = FontLoader('MaterialIcons')
+      ..addFont(
+        rootBundle.load(
+          'packages/flutter/src/material/fonts/MaterialIcons-Regular.otf',
+        ),
+      );
+    await Future.wait([tajawalLoader.load(), materialIconsLoader.load()]);
   });
 
   testWidgets('generate iPhone 6.9-inch App Store screenshots', (tester) async {
