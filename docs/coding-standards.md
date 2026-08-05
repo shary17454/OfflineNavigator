@@ -76,7 +76,7 @@ Rawaya API’s global `ValidationPipe({ whitelist: true, transform: true })` is 
 - Do not introduce abbreviations that obscure Arabic heritage concepts.
 - Keep user-facing brand names separate from target/module identifiers.
 
-TypeScript is configured with `strict: true`; do not suppress it with `any`. Dart’s `analysis_options.yaml` includes `flutter_lints` لكن `pubspec.yaml` لا يعلنها في `dev_dependencies` حاليًا؛ لذلك أصلح هذا النقص في مهمة dependencies مقصودة قبل اعتماد `flutter analyze` كـgate، ثم اجعل كل Dart جديد يمر به.
+TypeScript is configured with `strict: true`; do not suppress it with `any`. Dart’s `analysis_options.yaml` and `pubspec.yaml` include `flutter_lints`; every Dart change must pass `flutter analyze`.
 
 ## 7. Concurrency and performance
 
@@ -130,7 +130,7 @@ npm run test
 
 # Flutter
 cd rawayah/apps/mobile
-# blocked today: analysis_options.yaml imports flutter_lints but pubspec.yaml omits it
+flutter analyze
 flutter test
 flutter build ios --release --no-codesign
 ```

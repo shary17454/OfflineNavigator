@@ -75,9 +75,9 @@ xcodebuild archive \
 
 - ملف GitHub Actions موجود في `rawayah/.github/workflows/rawaya-ci.yml`، وليس `.github/workflows/` في جذر repository؛ GitHub لن يكتشفه كworkflow لهذا المستودع في هذا الموضع.
 - أوامر workflow تستخدم `apps/mobile` و`package*.json` كما لو كان `rawayah/` هو جذر repository، بينما الجذر الفعلي يحتويها تحت `rawayah/`.
-- لا يوجد `PrivacyInfo.xcprivacy` تحت Runner.
-- ملفات App Icon المتعددة موجودة في `rawayah/apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/`، لكن صلاحيتها للمتجر لا تُثبت إلا بـValidate Archive (الأبعاد، opacity، وربط الـasset).
-- `ApiClient` يستخدم HTTP إلى `10.0.2.2`; هذا إعداد تطوير Android، وليس endpoint إصدار iOS.
+- `PrivacyInfo.xcprivacy` موجود تحت Runner ومضاف إلى Resources؛ يجب تأكيده في تقرير Archive.
+- ملفات App Icon المخصصة موجودة في `rawayah/apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/`، لكن صلاحيتها للمتجر لا تُثبت إلا بـValidate Archive (الأبعاد، opacity، وربط الـasset).
+- `ApiClient` يقرأ `API_BASE_URL` من بيئة البناء ويرفض أي قيمة غير HTTPS؛ التدفقات المحلية الحالية لا تعتمد على الخادم.
 
 ### بوابات المنصة والجوال
 
@@ -95,7 +95,7 @@ npm run test
 
 ```sh
 flutter pub get
-# blocked until flutter_lints is added to dev_dependencies
+flutter analyze
 flutter test
 flutter build ios --release --no-codesign
 ```

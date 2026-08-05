@@ -134,7 +134,7 @@ The admin content page duplicates its own API base URL and raw `fetch` calls des
 
 `RawayaRoutes.list` contains 30 paths, but only `/home`, `/search`, `/auth`, and the nested `/offline` flow have dedicated pages. All other listed routes are generated as `PlaceholderPage`.
 
-`ApiClient` only exposes GET and defaults to Android emulator loopback (`http://10.0.2.2:4000/api`). It has no environment selection, auth interceptor, refresh handling, structured error mapping, or TLS enforcement.
+`ApiClient` currently exposes GET, reads `API_BASE_URL` from the build environment, and rejects missing or non-HTTPS URLs. The App Store-facing local notebook and search do not call it. It still has no auth interceptor, refresh handling, or structured error mapping for future connected features.
 
 The offline notebook:
 

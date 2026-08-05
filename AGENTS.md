@@ -94,7 +94,7 @@
 
 | معيار | قياس عملي في هذا المستودع |
 | --- | --- |
-| بناء | `xcodebuild` لـ OfflineNavigator أو Riwaya؛ `npm run build` للمنصة؛ `flutter build ios --release --no-codesign` + Xcode Cloud scripts للجوال. `flutter analyze` غير متاح كـgate حاليًا حتى إضافة `flutter_lints` إلى dev dependencies |
+| بناء | `xcodebuild` لـ OfflineNavigator أو Riwaya؛ `npm run build` للمنصة؛ `flutter analyze` و`flutter test` و`flutter build ios --release --no-codesign` + Xcode Cloud scripts للجوال |
 | اختبارات | لا تحذف/تُضعف Assertions؛ أضف Regression عند إصلاح منطق قابل للاختبار (`NavigationMath`, `GPXService`, `TextStats`, Nest unit) |
 | Diff | ملفات المهمة فقط؛ لا تنسيق جماعي |
 | أسرار | لا JWT secrets أو مفاتيح في الكود؛ لا تعطيل ATS بلا طلب |

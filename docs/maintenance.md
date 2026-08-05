@@ -70,8 +70,8 @@
 
 | أولوية | الفجوة | توصية آمنة / معيار الإغلاق |
 | --- | --- | --- |
-| مانع إصدار | Privacy Manifest غير موجود؛ App Icons موجودة لكنها غير متحققة في Archive | جرد plugins، إضافة manifest، ثم Validate Archive للأيقونات والخصوصية |
-| مانع إصدار | API base `http://10.0.2.2:4000/api` | config per environment، production HTTPS، واختبار يمنع dev URL في Release |
+| تحقق إصدار | Privacy Manifest وApp Icon مخصص موجودان لكنهما غير متحققين في Archive | نفّذ Validate Archive وافحص تقرير الخصوصية والأيقونة |
+| تحقق إصدار | `API_BASE_URL` اختياري للتدفقات المستقبلية ويُقبل فقط كـHTTPS | مرّر عنوان production في workflow عند تفعيل ميزات الخادم، واختبر رفض القيم غير الآمنة |
 | عالٍ | معظم routes هي `PlaceholderPage` وSearch يعرض fallback تجريبي | feature inventory صادق؛ لا expose/market حتى اكتمال success/error/empty tests |
 | عالٍ | الدفتر JSON كامل في SharedPreferences (`rawaya_offline_works_v1`) | لا تغيّر المفتاح/الشكل بلا migration؛ انقل لقاعدة محلية فقط بتصميم وترقية واختبار حجم |
 | عالٍ | workflow تحت `rawayah/.github/` ومساراته تفترض جذرًا مختلفًا | إن أريد GitHub CI، انقله للجذر وعدل working directories في تغيير CI مستقل |
@@ -81,7 +81,7 @@
 
 ### مؤشرات صحة
 
-- `npm run lint`, `npm run build`, `npm run test`, `flutter test`, و`flutter build ios --release --no-codesign`: صفر فشل. `flutter analyze` يصبح gate بعد إضافة `flutter_lints` المفقودة إلى `dev_dependencies`.
+- `npm run lint`, `npm run build`, `npm run test`, `flutter analyze`, `flutter test`, و`flutter build ios --release --no-codesign`: صفر فشل قبل الإصدار.
 - migrations تُجرّب على نسخة من schema السابق؛ لا `db push` مدمر في الإنتاج.
 - API p95 للتدفقات الأساسية له baseline متفق عليه؛ أي تراجع >20% يوقف الإصدار حتى التفسير.
 - اختبار ترقية يحفظ عينة دفتر كبيرة عبر تغيير الإصدار؛ checksum/عدد الأعمال والفصول متطابق.
@@ -118,7 +118,7 @@
 ## إدارة dependencies والأدوات
 
 - SwiftUI apps لا تعرض package dependencies خارج أطر Apple حاليًا؛ لا تضف مكتبة لمهمة يمكن تنفيذها بأطر النظام من دون مبرر.
-- Flutter/Dart versions وNode 20+ موثقة، لكن لا يوجد `pubspec.lock` محفوظ حاليًا؛ أضفه في مهمة reproducibility مقصودة قبل الإصدار. راجع `package-lock.json`، ثم راجع/حدّث `pubspec.lock` بعد اعتماده.
+- Flutter/Dart versions وNode 20+ موثقة، و`pubspec.lock` محفوظ لقابلية إعادة بناء التطبيق. راجع تغييرات `package-lock.json` و`pubspec.lock` في أي تحديث dependencies.
 - حدّث dependency واحدة أو مجموعة مترابطة لكل تغيير، اقرأ changelog، شغّل الاختبارات، وافحص privacy/permissions.
 - لا ترفع iOS 13/17 targets أو Swift 5.0 تلقائيًا عند تحديث Xcode.
 

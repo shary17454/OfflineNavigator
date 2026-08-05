@@ -115,7 +115,7 @@ npm run build:api
 
 cd apps/mobile
 flutter test
-# flutter analyze is blocked until flutter_lints is declared in dev_dependencies
+flutter analyze
 flutter build ios --release --no-codesign
 ```
 

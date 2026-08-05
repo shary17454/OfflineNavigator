@@ -168,7 +168,9 @@ class _OfflineWorkPageState extends State<OfflineWorkPage> {
   Future<void> _persist() async {
     final current = _work;
     if (current == null) return;
-    current.title = _titleController.text.trim().isEmpty ? current.title : _titleController.text.trim();
+    current.title = _titleController.text.trim().isEmpty
+        ? current.title
+        : _titleController.text.trim();
     current.synopsis = _synopsisController.text.trim();
     current.updatedAt = DateTime.now();
     final works = await _store.loadWorks();
@@ -265,7 +267,8 @@ class _OfflineWorkPageState extends State<OfflineWorkPage> {
                   onTap: () async {
                     await _persist();
                     if (!context.mounted) return;
-                    await context.push('/offline/work/${work.id}/chapter/${chapter.id}');
+                    await context
+                        .push('/offline/work/${work.id}/chapter/${chapter.id}');
                     await _load();
                   },
                 ),
@@ -318,7 +321,8 @@ class _OfflineChapterPageState extends State<OfflineChapterPage> {
   Future<void> _load() async {
     final works = await _store.loadWorks();
     final work = works.where((item) => item.id == widget.workId).firstOrNull;
-    final chapter = work?.chapters.where((item) => item.id == widget.chapterId).firstOrNull;
+    final chapter =
+        work?.chapters.where((item) => item.id == widget.chapterId).firstOrNull;
     if (!mounted) return;
     setState(() {
       _work = work;
@@ -334,8 +338,9 @@ class _OfflineChapterPageState extends State<OfflineChapterPage> {
     final work = _work;
     final chapter = _chapter;
     if (work == null || chapter == null) return;
-    chapter.title =
-        _titleController.text.trim().isEmpty ? chapter.title : _titleController.text.trim();
+    chapter.title = _titleController.text.trim().isEmpty
+        ? chapter.title
+        : _titleController.text.trim();
     chapter.body = _bodyController.text;
     chapter.updatedAt = DateTime.now();
     work.updatedAt = DateTime.now();
@@ -392,12 +397,14 @@ class _OfflineChapterPageState extends State<OfflineChapterPage> {
                           value: _fontSize,
                           min: 14,
                           max: 34,
-                          onChanged: (value) => setState(() => _fontSize = value),
+                          onChanged: (value) =>
+                              setState(() => _fontSize = value),
                         ),
                       ),
                       IconButton(
                         onPressed: () => setState(() => _night = !_night),
-                        icon: Icon(_night ? Icons.light_mode : Icons.dark_mode, color: fg),
+                        icon: Icon(_night ? Icons.light_mode : Icons.dark_mode,
+                            color: fg),
                       ),
                     ],
                   ),
@@ -411,11 +418,14 @@ class _OfflineChapterPageState extends State<OfflineChapterPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _bodyController.text.isEmpty ? 'لا يوجد نص بعد.' : _bodyController.text,
+                    _bodyController.text.isEmpty
+                        ? 'لا يوجد نص بعد.'
+                        : _bodyController.text,
                     style: TextStyle(
                       fontSize: _fontSize,
                       height: 1.7,
-                      color: fg.withOpacity(_bodyController.text.isEmpty ? 0.6 : 1),
+                      color: fg
+                          .withOpacity(_bodyController.text.isEmpty ? 0.6 : 1),
                     ),
                   ),
                 ],
@@ -426,7 +436,8 @@ class _OfflineChapterPageState extends State<OfflineChapterPage> {
                   children: [
                     TextField(
                       controller: _titleController,
-                      decoration: const InputDecoration(labelText: 'عنوان الفصل'),
+                      decoration:
+                          const InputDecoration(labelText: 'عنوان الفصل'),
                     ),
                     const SizedBox(height: 12),
                     Expanded(

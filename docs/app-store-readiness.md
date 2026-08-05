@@ -7,7 +7,7 @@
 | المنتج | جاهزية مؤكدة من المصدر | مانع/فجوة حالية |
 | --- | --- | --- |
 | مدّل | Bundle/Team/category/usage strings/privacy manifest/scheme وApp Icon موجودة | تعارض 1.0 مقابل README 1.1؛ App Store record وKVS provisioning غير مثبتين؛ يلزم Validate Archive للأيقونة |
-| موروث (Rawaya) | App ID `6797734164` وBundle/Team/workspace/scheme وملفات App Icon موثقة | لا Privacy Manifest؛ endpoint تطوير HTTP؛ ميزات placeholders؛ أول Xcode Cloud workflow غير مثبت؛ يلزم Validate Archive للأيقونات |
+| موروث (Rawaya) | App ID `6797734164` وBundle/Team/workspace/scheme وApp Icon مخصص وPrivacy Manifest وHTTPS configuration موثقة | أول Xcode Cloud workflow/build غير مثبت؛ يلزم Validate Archive للأيقونات والـmanifest |
 | موروث | Bundle/Team/category/privacy manifest/scheme وApp Icon موجودة | لا App Store Connect App ID أو Xcode Cloud موثق؛ يلزم Validate Archive للأيقونة |
 
 أي مانع في الجدول يعني **غير جاهز للإرسال** حتى يُغلق ويُتحقق من Archive فعلي.
@@ -83,8 +83,8 @@
 ### موانع حالية
 
 - [ ] تحقق عبر Release Archive من ملفات App Icon الموجودة في `Runner/Assets.xcassets/AppIcon.appiconset/` (كل الأحجام، opacity، وasset compilation).
-- [ ] أضف/ولّد Privacy Manifest مناسبًا بعد جرد Flutter plugins وDio وSharedPreferences.
-- [ ] استبدل `http://10.0.2.2:4000/api` بعنوان HTTPS production configurable، وتحقق من ATS.
+- [x] أضيف `PrivacyInfo.xcprivacy` مع سبب UserDefaults `CA92.1` بعد جرد plugins الحالي.
+- [x] أصبح `ApiClient` يقبل `API_BASE_URL` عبر بيئة البناء ويرفض غير HTTPS؛ لا تستخدم الشبكة في التدفقات المحلية الحالية.
 - [ ] احذف نتائج البحث التجريبية أو ميّز failure صراحة؛ لا تعرضها كمحتوى حقيقي.
 - [ ] لا تسوق المسارات التي تقود إلى `PlaceholderPage` كميزات مكتملة.
 - [ ] طابق version `0.1.0+1` والنص الثابت «0.1.0 — MVP» مع App Store build المقصود.

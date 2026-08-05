@@ -8,7 +8,6 @@ coverage
 build
 .flutter-plugins
 .flutter-plugins-dependencies
-pubspec.lock
 ios/Pods
 packages/**/dist
 .next

@@ -36,11 +36,10 @@ Why: Riwaya is an offline companion. Do not document cross-device/server synchro
 
 ### Rawaya Flutter
 
-- `ApiClient` constructs Dio with base URL `http://10.0.2.2:4000/api`, 10-second connect timeout and 12-second receive timeout.
+- `ApiClient` reads `API_BASE_URL` from the build environment, requires a valid HTTPS URL, and configures 10-second connect and 12-second receive timeouts.
 - Only `get` is wrapped; there is no shared provider, auth interceptor, refresh flow, retry policy, send timeout, cancellation, structured decoding or error mapping.
-- `SearchPage` sends `'/search?query=$value'` by string interpolation. Characters such as `&`, `#`, `?`, spaces and Arabic text should be sent through Dio `queryParameters`, not assembled into a path.
-- Every search creates a new `ApiClient`, and submitted searches are not cancelled. A slow older request can overwrite a newer result.
-- On any exception, the UI fabricates `نتيجة تجريبية عن: ...`; this hides offline, timeout, TLS, server and schema failures.
+- The current App Store-facing `HomePage`, local notebook, and `SearchPage` do not call the API. Search reads `OfflineLibraryStore` and never fabricates a network result.
+- Future connected features must inject one `ApiClient`, pass dynamic values via Dio `queryParameters`, and implement explicit error states.
 
 ## Endpoint and URL contract
 
@@ -48,12 +47,12 @@ Keep URL construction explicit:
 
 | Surface | Development example | Production requirement |
 | --- | --- | --- |
-| Flutter API | Android emulator: `http://10.0.2.2:4000/api` | `https://<api-host>/api`, injected at build/runtime configuration. |
+| Flutter API | `--dart-define=API_BASE_URL=https://dev.example/api` | `https://<api-host>/api`, injected at build time; non-HTTPS or missing values are rejected when the client is constructed. |
 | Nest Swagger | `http://localhost:4000/api/docs` | Disabled or access-restricted unless intentionally public. |
 | Media URL | `/assets/media/<random-name>` | Absolute URL derived from trusted public-base configuration or CDN; private media must not use public static URLs. |
 | Apple/Google map link | HTTPS external URL with exact coordinate | User-initiated only, with clear privacy implications. |
 
-`10.0.2.2` is Android-emulator-specific. It is not localhost from an iOS simulator, a physical device or production app.
+Do not restore `10.0.2.2` or any cleartext default. Local-only release paths must remain independent of network configuration.
 
 ## Client policy
 

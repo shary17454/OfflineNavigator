@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/api_client.dart';
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -11,18 +9,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late final Future<List<String>> _sections = _loadSections();
-
-  Future<List<String>> _loadSections() async {
-    try {
-      final response = await ApiClient().get<Map<String, dynamic>>('/home');
-      final items = response.data?['featuredSections'];
-      if (items is List) return items.map((item) => item.toString()).toList();
-    } catch (_) {
-      return const ['الشعر', 'القصص', 'الكتب والمراجع', 'الخيل', 'الإبل', 'الصقارة'];
-    }
-    return const ['الشعر', 'القصص', 'الكتب والمراجع'];
-  }
+  final Future<List<String>> _sections = Future.value(
+    const ['الشعر', 'القصص', 'الكتب والمراجع', 'الخيل', 'الإبل', 'الصقارة'],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +77,8 @@ class _HomePageState extends State<HomePage> {
             FutureBuilder<List<String>>(
               future: _sections,
               builder: (context, snapshot) {
-                final sections = snapshot.data ?? const ['الشعر', 'القصص', 'الكتب'];
+                final sections =
+                    snapshot.data ?? const ['الشعر', 'القصص', 'الكتب'];
                 return Wrap(
                   spacing: 10,
                   runSpacing: 10,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/api_client.dart';
+import '../offline/offline_models.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -11,23 +11,42 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final _controller = TextEditingController();
+  final _store = OfflineLibraryStore();
   List<String> _results = const [];
   bool _loading = false;
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Future<void> _search(String value) async {
-    setState(() => _loading = true);
-    try {
-      final response = await ApiClient().get<Map<String, dynamic>>('/search?query=$value');
-      final data = response.data ?? {};
-      final poems = (data['poems'] as List? ?? []).map((item) => item['title'].toString());
-      final stories = (data['stories'] as List? ?? []).map((item) => item['title'].toString());
-      final books = (data['books'] as List? ?? []).map((item) => item['title'].toString());
-      _results = [...poems, ...stories, ...books];
-    } catch (_) {
-      _results = value.trim().isEmpty ? const [] : ['نتيجة تجريبية عن: $value'];
-    } finally {
-      if (mounted) setState(() => _loading = false);
+    final query = value.trim();
+    if (query.isEmpty) {
+      setState(() => _results = const []);
+      return;
     }
+    setState(() => _loading = true);
+    final works = await _store.loadWorks();
+    final results = works
+        .where((work) {
+          final searchableText = [
+            work.title,
+            work.authorName,
+            work.genre,
+            work.synopsis,
+            ...work.chapters.expand((chapter) => [chapter.title, chapter.body]),
+          ].join(' ');
+          return searchableText.contains(query);
+        })
+        .map((work) => work.title)
+        .toList();
+    if (!mounted) return;
+    setState(() {
+      _results = results;
+      _loading = false;
+    });
   }
 
   @override
@@ -55,6 +74,13 @@ class _SearchPageState extends State<SearchPage> {
               ),
               const SizedBox(height: 16),
               if (_loading) const LinearProgressIndicator(),
+              if (!_loading &&
+                  _controller.text.trim().isNotEmpty &&
+                  _results.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Text('لا توجد نتائج في دفترك المحلي'),
+                ),
               Expanded(
                 child: ListView.builder(
                   itemCount: _results.length,
