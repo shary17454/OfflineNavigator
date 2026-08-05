@@ -1,4 +1,4 @@
-# رواية التراث — إعداد Xcode Cloud
+# موروث — إعداد Xcode Cloud
 
 تم تسجيل التطبيق في Apple ومطابقته في هذا المستودع.
 
@@ -6,10 +6,10 @@
 
 | العنصر | القيمة |
 | --- | --- |
-| اسم App Store Connect | **رواية التراث** |
+| اسم App Store Connect | **موروث** |
 | App ID | `6797734164` |
 | Bundle ID | `com.shary17454.rawaya` |
-| Display Name على الجهاز | رواية التراث |
+| Display Name على الجهاز | موروث |
 | Team | `4HM66AD594` |
 | صفحة Xcode Cloud | https://appstoreconnect.apple.com/teams/26cc2279-524d-4d33-ba75-9333cf111ad1/apps/6797734164/ci |
 
@@ -26,7 +26,7 @@
 1. افتح Xcode.
 2. من القائمة: **Integrate → Create Workflow…**
 3. اختر:
-   - **App:** رواية التراث
+   - **App:** موروث
    - **Workspace:** `rawayah/apps/mobile/ios/Runner.xcworkspace`
    - **Scheme:** `Runner`
    - **Branch:** `main` (بعد دمج هذا الـPR) أو `codex/rawaya-mvp-xcode-cloud-proper` في `my-codex`

@@ -15,9 +15,12 @@ class PlaceholderPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            const Text('هذه الشاشة ضمن بنية MVP الأولى، وتُفصل الآن كمكون احتياطي جاهز للتطوير.'),
+            const Text(
+                'هذه الشاشة ضمن بنية MVP الأولى، وتُفصل الآن كمكون احتياطي جاهز للتطوير.'),
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: () => context.go('/home'),

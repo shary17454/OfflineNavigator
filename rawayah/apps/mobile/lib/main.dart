@@ -70,10 +70,22 @@ class RawayaRoutes {
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     routes: [
-      GoRoute(path: '/', name: 'splash', builder: (context, state) => const SplashPage()),
-      GoRoute(path: '/home', name: 'home', builder: (context, state) => const HomePage()),
-      GoRoute(path: '/search', name: 'search', builder: (context, state) => const SearchPage()),
-      GoRoute(path: '/auth', name: 'auth', builder: (context, state) => const AuthPage()),
+      GoRoute(
+          path: '/',
+          name: 'splash',
+          builder: (context, state) => const SplashPage()),
+      GoRoute(
+          path: '/home',
+          name: 'home',
+          builder: (context, state) => const HomePage()),
+      GoRoute(
+          path: '/search',
+          name: 'search',
+          builder: (context, state) => const SearchPage()),
+      GoRoute(
+          path: '/auth',
+          name: 'auth',
+          builder: (context, state) => const AuthPage()),
       GoRoute(
         path: '/offline',
         name: 'offline',
@@ -97,11 +109,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
       ...RawayaRoutes.list
-          .where((path) => !['/home', '/search', '/auth', '/offline'].contains(path))
+          .where((path) =>
+              !['/home', '/search', '/auth', '/offline'].contains(path))
           .map(
             (path) => GoRoute(
               path: path,
-              builder: (context, state) => PlaceholderPage(title: RawayaRoutes.title(path)),
+              builder: (context, state) =>
+                  PlaceholderPage(title: RawayaRoutes.title(path)),
             ),
           ),
     ],
@@ -116,7 +130,8 @@ class RawayaApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
-      title: 'رواية التراث',
+      title: 'موروث',
+      debugShowCheckedModeBanner: false,
       routerConfig: router,
       theme: ThemeData(
         fontFamily: 'Tajawal',
@@ -130,16 +145,38 @@ class RawayaApp extends ConsumerWidget {
   }
 }
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.delayed(const Duration(milliseconds: 900), () {
+      if (mounted) context.goNamed('home');
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: FilledButton(
-          onPressed: () => context.goNamed('home'),
-          child: const Text('رواية… ذاكرة التراث العربي'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.auto_stories, size: 72, color: Color(0xFFB68843)),
+            SizedBox(height: 20),
+            Text(
+              'موروث',
+              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('ذاكرة التراث العربي'),
+          ],
         ),
       ),
     );

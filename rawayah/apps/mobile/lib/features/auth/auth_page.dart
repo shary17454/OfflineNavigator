@@ -6,7 +6,8 @@ class AuthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(child: Text('واجهة الدخول/التسجيل - المرحلة القادمة ضمن MVP لاحقًا')),
+      body: Center(
+          child: Text('واجهة الدخول/التسجيل - المرحلة القادمة ضمن MVP لاحقًا')),
     );
   }
 }

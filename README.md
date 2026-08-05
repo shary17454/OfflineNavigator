@@ -1,9 +1,11 @@
 # Apps in this repository
 
+> Engineering agents and contributors must start with [`AGENTS.md`](AGENTS.md), then use the indexed project documentation in [`docs/README.md`](docs/README.md).
+
 | App | Path / Project | Notes |
 | --- | --- | --- |
 | **مدّل** | `OfflineNavigator.xcodeproj` | Offline coordinate navigator |
-| **رواية التراث (Codex platform)** | `rawayah/` | Rawaya heritage platform from `my-codex` — ASC app رواية التراث / `com.shary17454.rawaya` |
+| **موروث (Codex platform)** | `rawayah/` | Rawaya heritage platform from `my-codex` — ASC app موروث / `com.shary17454.rawaya` |
 | **رواية (SwiftUI offline companion)** | `Riwaya.xcodeproj` | Native iOS offline companion |
 
 See [`docs/RAWAYA_MERGE.md`](docs/RAWAYA_MERGE.md), [`docs/RAWAYA_XCODE_CLOUD.md`](docs/RAWAYA_XCODE_CLOUD.md), and [`rawayah/README.md`](rawayah/README.md).

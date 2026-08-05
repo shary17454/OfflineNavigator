@@ -18,7 +18,10 @@ class OfflineChapter {
   int get wordCount {
     final cleaned = body.trim();
     if (cleaned.isEmpty) return 0;
-    return cleaned.split(RegExp(r'\s+')).where((part) => part.isNotEmpty).length;
+    return cleaned
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .length;
   }
 
   Map<String, dynamic> toJson() => {
@@ -32,7 +35,8 @@ class OfflineChapter {
         id: json['id'] as String,
         title: json['title'] as String? ?? '',
         body: json['body'] as String? ?? '',
-        updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ?? DateTime.now(),
+        updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
+            DateTime.now(),
       );
 }
 
@@ -77,10 +81,12 @@ class OfflineWork {
         genre: json['genre'] as String? ?? 'قصة',
         synopsis: json['synopsis'] as String? ?? '',
         isFavorite: json['isFavorite'] as bool? ?? false,
-        updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ?? DateTime.now(),
+        updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
+            DateTime.now(),
         chapters: ((json['chapters'] as List?) ?? [])
             .whereType<Map>()
-            .map((item) => OfflineChapter.fromJson(Map<String, dynamic>.from(item)))
+            .map((item) =>
+                OfflineChapter.fromJson(Map<String, dynamic>.from(item)))
             .toList(),
       );
 }
@@ -119,7 +125,7 @@ class OfflineLibraryStore {
       title: 'ظل على الرمال',
       authorName: 'مساهمة تجريبية',
       genre: 'قصة',
-      synopsis: 'نص تجريبي محلي للقراءة والكتابة دون اتصال داخل تطبيق رواية التراث.',
+      synopsis: 'نص تجريبي محلي للقراءة والكتابة دون اتصال داخل تطبيق موروث.',
       updatedAt: DateTime.now(),
       isFavorite: true,
       chapters: [
