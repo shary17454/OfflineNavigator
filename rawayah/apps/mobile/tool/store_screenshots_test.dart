@@ -1,8 +1,4 @@
-import 'dart:io';
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,15 +10,9 @@ const _captureKey = ValueKey('store-screenshot-boundary');
 Future<void> _saveScreenshot(
   WidgetTester tester, {
   required String path,
-  required double pixelRatio,
 }) async {
   await tester.pump();
-  final boundary = tester.renderObject<RenderRepaintBoundary>(
-    find.byKey(_captureKey),
-  );
-  final image = await boundary.toImage(pixelRatio: pixelRatio);
-  final data = await image.toByteData(format: ui.ImageByteFormat.png);
-  await File(path).writeAsBytes(data!.buffer.asUint8List(), flush: true);
+  await expectLater(find.byKey(_captureKey), matchesGoldenFile(path));
 }
 
 Future<void> _pumpApp(WidgetTester tester) async {
@@ -53,7 +43,6 @@ Future<void> _captureDevice(
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/01-home.png',
-    pixelRatio: pixelRatio,
   );
 
   await tester.tap(find.byType(TextField).first);
@@ -64,7 +53,6 @@ Future<void> _captureDevice(
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/05-search.png',
-    pixelRatio: pixelRatio,
   );
 
   await _pumpApp(tester);
@@ -73,7 +61,6 @@ Future<void> _captureDevice(
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/02-library.png',
-    pixelRatio: pixelRatio,
   );
 
   await tester.tap(find.text('ظل على الرمال'));
@@ -81,7 +68,6 @@ Future<void> _captureDevice(
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/03-work.png',
-    pixelRatio: pixelRatio,
   );
 
   await tester.tap(find.text('الخريطة'));
@@ -89,7 +75,6 @@ Future<void> _captureDevice(
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/04-chapter.png',
-    pixelRatio: pixelRatio,
   );
 }
 
@@ -99,7 +84,7 @@ void main() {
       tester,
       logicalSize: const Size(440, 956),
       pixelRatio: 3,
-      outputDirectory: 'store_assets/iphone-6.9',
+      outputDirectory: '../store_assets/iphone-6.9',
     );
   });
 
@@ -108,7 +93,7 @@ void main() {
       tester,
       logicalSize: const Size(1032, 1376),
       pixelRatio: 2,
-      outputDirectory: 'store_assets/ipad-13',
+      outputDirectory: '../store_assets/ipad-13',
     );
   });
 }
