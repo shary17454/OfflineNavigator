@@ -97,9 +97,7 @@ void main() {
       ..addFont(rootBundle.load('assets/fonts/Tajawal-Bold.ttf'));
     final materialIconsLoader = FontLoader('MaterialIcons')
       ..addFont(
-        rootBundle.load(
-          'packages/flutter/src/material/fonts/MaterialIcons-Regular.otf',
-        ),
+        rootBundle.load('assets/fonts/MaterialIcons-Regular.otf'),
       );
     await Future.wait([tajawalLoader.load(), materialIconsLoader.load()]);
   });
