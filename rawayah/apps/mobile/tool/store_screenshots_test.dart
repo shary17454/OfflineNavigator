@@ -26,6 +26,10 @@ Future<void> _pumpApp(WidgetTester tester) async {
       child: ProviderScope(key: UniqueKey(), child: const RawayaApp()),
     ),
   );
+  await _advance(tester);
+}
+
+Future<void> _advance(WidgetTester tester) async {
   await tester.pump(const Duration(seconds: 1));
   await tester.pump(const Duration(seconds: 1));
 }
@@ -50,10 +54,10 @@ Future<void> _captureDevice(
   );
 
   GoRouter.of(tester.element(find.byType(HomePage))).go('/search');
-  await tester.pump(const Duration(seconds: 1));
+  await _advance(tester);
   await tester.enterText(find.byType(TextField), 'راشد');
   await tester.tap(find.byIcon(Icons.arrow_forward));
-  await tester.pump(const Duration(seconds: 1));
+  await _advance(tester);
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/05-search.png',
@@ -61,7 +65,7 @@ Future<void> _captureDevice(
 
   await _pumpApp(tester);
   GoRouter.of(tester.element(find.byType(HomePage))).go('/offline');
-  await tester.pump(const Duration(seconds: 1));
+  await _advance(tester);
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/02-library.png',
@@ -70,7 +74,7 @@ Future<void> _captureDevice(
   GoRouter.of(
     tester.element(find.byType(OfflineLibraryPage)),
   ).push('/offline/work/seed-1');
-  await tester.pump(const Duration(seconds: 1));
+  await _advance(tester);
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/03-work.png',
@@ -79,7 +83,7 @@ Future<void> _captureDevice(
   GoRouter.of(
     tester.element(find.byType(OfflineWorkPage)),
   ).push('/offline/work/seed-1/chapter/seed-ch-1');
-  await tester.pump(const Duration(seconds: 1));
+  await _advance(tester);
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/04-chapter.png',
