@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:rawaya_mobile/features/home/home_page.dart';
+import 'package:rawaya_mobile/features/offline/offline_library_page.dart';
 import 'package:rawaya_mobile/main.dart';
 
 const _captureKey = ValueKey('store-screenshot-boundary');
@@ -46,10 +49,10 @@ Future<void> _captureDevice(
     path: '$outputDirectory/01-home.png',
   );
 
-  await tester.tap(find.byType(TextField).first);
+  GoRouter.of(tester.element(find.byType(HomePage))).go('/search');
   await tester.pump(const Duration(seconds: 1));
   await tester.enterText(find.byType(TextField), 'راشد');
-  await tester.testTextInput.receiveAction(TextInputAction.done);
+  await tester.tap(find.byIcon(Icons.arrow_forward));
   await tester.pump(const Duration(seconds: 1));
   await _saveScreenshot(
     tester,
@@ -57,21 +60,25 @@ Future<void> _captureDevice(
   );
 
   await _pumpApp(tester);
-  await tester.tap(find.text('دفتر دون اتصال'));
+  GoRouter.of(tester.element(find.byType(HomePage))).go('/offline');
   await tester.pump(const Duration(seconds: 1));
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/02-library.png',
   );
 
-  await tester.tap(find.text('ظل على الرمال'));
+  GoRouter.of(
+    tester.element(find.byType(OfflineLibraryPage)),
+  ).push('/offline/work/seed-1');
   await tester.pump(const Duration(seconds: 1));
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/03-work.png',
   );
 
-  await tester.tap(find.text('الخريطة'));
+  GoRouter.of(
+    tester.element(find.byType(OfflineWorkPage)),
+  ).push('/offline/work/seed-1/chapter/seed-ch-1');
   await tester.pump(const Duration(seconds: 1));
   await _saveScreenshot(
     tester,
