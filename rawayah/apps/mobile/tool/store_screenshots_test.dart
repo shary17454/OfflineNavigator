@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -79,6 +80,13 @@ Future<void> _captureDevice(
 }
 
 void main() {
+  setUpAll(() async {
+    final fontLoader = FontLoader('Tajawal')
+      ..addFont(rootBundle.load('assets/fonts/Tajawal-Regular.ttf'))
+      ..addFont(rootBundle.load('assets/fonts/Tajawal-Bold.ttf'));
+    await fontLoader.load();
+  });
+
   testWidgets('generate iPhone 6.9-inch App Store screenshots', (tester) async {
     await _captureDevice(
       tester,
