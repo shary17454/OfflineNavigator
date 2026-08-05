@@ -16,7 +16,7 @@ Future<void> _saveScreenshot(
   required String path,
   required double pixelRatio,
 }) async {
-  await tester.binding.endOfFrame;
+  await tester.pump();
   final boundary = tester.renderObject<RenderRepaintBoundary>(
     find.byKey(_captureKey),
   );
