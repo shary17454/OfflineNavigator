@@ -33,7 +33,7 @@ Future<void> _pumpApp(WidgetTester tester) async {
     ),
   );
   await tester.pump(const Duration(seconds: 1));
-  await tester.pumpAndSettle();
+  await tester.pump(const Duration(seconds: 1));
 }
 
 Future<void> _captureDevice(
@@ -57,10 +57,10 @@ Future<void> _captureDevice(
   );
 
   await tester.tap(find.byType(TextField).first);
-  await tester.pumpAndSettle();
+  await tester.pump(const Duration(seconds: 1));
   await tester.enterText(find.byType(TextField), 'راشد');
   await tester.testTextInput.receiveAction(TextInputAction.done);
-  await tester.pumpAndSettle();
+  await tester.pump(const Duration(seconds: 1));
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/05-search.png',
@@ -69,7 +69,7 @@ Future<void> _captureDevice(
 
   await _pumpApp(tester);
   await tester.tap(find.text('دفتر دون اتصال'));
-  await tester.pumpAndSettle();
+  await tester.pump(const Duration(seconds: 1));
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/02-library.png',
@@ -77,7 +77,7 @@ Future<void> _captureDevice(
   );
 
   await tester.tap(find.text('ظل على الرمال'));
-  await tester.pumpAndSettle();
+  await tester.pump(const Duration(seconds: 1));
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/03-work.png',
@@ -85,7 +85,7 @@ Future<void> _captureDevice(
   );
 
   await tester.tap(find.text('الخريطة'));
-  await tester.pumpAndSettle();
+  await tester.pump(const Duration(seconds: 1));
   await _saveScreenshot(
     tester,
     path: '$outputDirectory/04-chapter.png',
