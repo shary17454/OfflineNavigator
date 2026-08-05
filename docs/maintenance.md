@@ -74,7 +74,7 @@
 | تحقق إصدار | `API_BASE_URL` اختياري للتدفقات المستقبلية ويُقبل فقط كـHTTPS | مرّر عنوان production في workflow عند تفعيل ميزات الخادم، واختبر رفض القيم غير الآمنة |
 | عالٍ | معظم routes هي `PlaceholderPage` وSearch يعرض fallback تجريبي | feature inventory صادق؛ لا expose/market حتى اكتمال success/error/empty tests |
 | عالٍ | الدفتر JSON كامل في SharedPreferences (`rawaya_offline_works_v1`) | لا تغيّر المفتاح/الشكل بلا migration؛ انقل لقاعدة محلية فقط بتصميم وترقية واختبار حجم |
-| عالٍ | workflow تحت `rawayah/.github/` ومساراته تفترض جذرًا مختلفًا | إن أريد GitHub CI، انقله للجذر وعدل working directories في تغيير CI مستقل |
+| تحقق CI | workflow فعّال تحت `.github/workflows/rawaya-ci.yml` | راقب أول تشغيل وتأكد من نجاح Node وFlutter/iOS؛ الملف التاريخي تحت `rawayah/.github/` غير فعّال |
 | متوسط | Xcode Cloud ينزّل Flutter stable غير مثبت الإصدار | pin نسخة/commit متوافقة وسجلها لتكرارية البناء |
 | متوسط | `Tajawal` غير معرّف كasset | حزم الخط وترخيصه أو استخدم خط نظام |
 | متوسط | catch واسع يحول فشل الشبكة إلى محتوى تجريبي | نمذج error/offline، logging بلا PII، واختبارات حالات HTTP |
