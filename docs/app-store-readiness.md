@@ -89,7 +89,7 @@
 - [ ] لا تسوق المسارات التي تقود إلى `PlaceholderPage` كميزات مكتملة.
 - [ ] طابق version `0.1.0+1` والنص الثابت «0.1.0 — MVP» مع App Store build المقصود.
 - [ ] تحقق أن `Tajawal` محزم أو أزل ادعاء استخدامه؛ `pubspec.yaml` لا يعلن ملفات خط.
-- [x] أضيف workflow فعّال في `.github/workflows/rawaya-ci.yml` بمسارات صحيحة للجذر؛ تحقق من أول تشغيل قبل الاعتماد عليه.
+- [x] أضيف workflow جوال فعّال في `.github/workflows/rawaya-ci.yml`؛ نجح analyze/test و`flutter build ios --release --no-codesign` على macOS.
 - [ ] أنشئ أول Xcode Cloud workflow يدويًا وتحقق من build بدل الاستدلال من وجود السكربتات.
 
 ### محتوى المنصة

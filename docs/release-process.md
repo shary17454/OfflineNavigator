@@ -73,7 +73,7 @@ xcodebuild archive \
 
 ### فجوات CI يجب عدم إخفائها
 
-- workflow فعّال موجود في `.github/workflows/rawaya-ci.yml` ويستخدم `rawayah/` كـworking directory؛ الملف التاريخي تحت `rawayah/.github/` لا يكتشفه GitHub من جذر هذا المستودع.
+- workflow فعّال للجوال موجود في `.github/workflows/rawaya-ci.yml` ويشغّل analyze/test/iOS release build من `rawayah/apps/mobile/`. فحص Node منفصل مؤجل لأن `prisma generate` يكشف 25 علاقة schema بلا opposite field؛ لا تخفِ هذا الخلل داخل gate الجوال.
 - `PrivacyInfo.xcprivacy` موجود تحت Runner ومضاف إلى Resources؛ يجب تأكيده في تقرير Archive.
 - ملفات App Icon المخصصة موجودة في `rawayah/apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/`، لكن صلاحيتها للمتجر لا تُثبت إلا بـValidate Archive (الأبعاد، opacity، وربط الـasset).
 - `ApiClient` يقرأ `API_BASE_URL` من بيئة البناء ويرفض أي قيمة غير HTTPS؛ التدفقات المحلية الحالية لا تعتمد على الخادم.
