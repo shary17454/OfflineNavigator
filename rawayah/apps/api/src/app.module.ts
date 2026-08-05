@@ -14,6 +14,7 @@ import { SearchModule } from './modules/search/search.module';
 import { MediaModule } from './modules/media/media.module';
 import { ReadingListsModule } from './modules/reading-lists/reading-lists.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { GraphModule } from './modules/graph/graph.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
     MediaModule,
     ReadingListsModule,
     PaymentsModule,
+    GraphModule,
   ],
   providers: [
     {

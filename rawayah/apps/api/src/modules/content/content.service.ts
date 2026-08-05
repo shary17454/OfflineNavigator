@@ -41,17 +41,22 @@ export class ContentService {
     });
   }
 
-  getPoem(id: string) {
-    return this.prisma.poem.update({
+  async getPoem(id: string) {
+    const poem = await this.prisma.poem.update({
       where: { id },
       data: { viewCount: { increment: 1 } },
-      include: {
-        poet: true,
-        comments: { where: { isHidden: false, isDeleted: false }, include: { user: { select: { profile: true } } } },
-      },
+      include: { poet: true },
     }).catch(() => {
       throw new BadRequestException('القصيدة غير موجودة');
     });
+
+    const comments = await this.prisma.comment.findMany({
+      where: { contentType: 'POEM', contentId: id, isHidden: false, isDeleted: false },
+      include: { user: { select: { profile: true } } },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return { ...poem, comments };
   }
 
   listStories(q?: string) {

@@ -23,5 +23,16 @@
     "lint": "npm run -w @rawaya/api lint && npm run -w @rawaya/web lint && npm run -w @rawaya/admin lint",
     "docker:dev": "docker-compose up -d",
     "docker:prod": "docker-compose -f docker-compose.production.yml up -d"
+  },
+  "allowScripts": {
+    "@nestjs/core@10.4.22": true,
+    "@prisma/client@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "@swc/core@1.15.47": true,
+    "argon2@0.41.1": true,
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "prisma@5.22.0": true,
+    "unrs-resolver@1.12.2": true
   }
 }

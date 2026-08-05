@@ -49,6 +49,28 @@ enum ContentType {
   HUNTING_DOG
   QUESTION
   COMMENT
+  POET
+  MANUSCRIPT
+  HORSE_BREED
+  CAMEL_BREED
+  FALCON_BREED
+  HUNTING_DOG_BREED
+  HUNTING_ARTICLE
+  HUNTING_DOG_ARTICLE
+  NARRATOR
+  RECORDING
+  SOURCE
+}
+
+enum PassageKind {
+  PARAGRAPH
+  VERSE
+  CLAIM
+}
+
+enum ConsensusStatus {
+  AGREED
+  DISPUTED
 }
 
 enum SearchSource {
@@ -79,6 +101,12 @@ model User {
   userRoles     UserRole[]
   refreshTokens RefreshToken[]
   subscriptions Subscription[]
+  commentReports CommentReport[]
+  contentReports ContentReport[]
+  moderationLogs ModerationLog[]
+  auditLogs      AuditLog[]
+  payments       Payment[]
+  trustAssessments TrustAssessment[]
 }
 
 model Profile {
@@ -202,12 +230,6 @@ model Poem {
   ratingAverage Float? @default(0)
 
   poet          Poet @relation(fields: [poetId], references: [id], onDelete: Cascade)
-  tags          ContentTag[]
-  sources       ContentSource[]
-  comments      Comment[]
-  revisions     ContentRevision[]
-  audioTracks   AudioTrack[]
-  videos        Video[]
 }
 
 model Story {
@@ -233,10 +255,9 @@ model Story {
   publishedBy String?
   viewCount  Int @default(0)
   saveCount  Int @default(0)
+  poetId     String?
 
-  tags       ContentTag[]
-  sources    ContentSource[]
-  comments   Comment[]
+  poet       Poet? @relation(fields: [poetId], references: [id], onDelete: SetNull)
 }
 
 model HistoricalEvent {
@@ -258,7 +279,6 @@ model HistoricalEvent {
   reviewedBy      String?
   publishedBy     String?
 
-  sources         ContentSource[]
 }
 
 model Tribe {
@@ -280,7 +300,6 @@ model Tribe {
   reviewedBy      String?
   publishedBy     String?
 
-  sources         ContentSource[]
 }
 
 model Place {
@@ -300,8 +319,8 @@ model Place {
   createdBy       String?
   reviewedBy      String?
   publishedBy     String?
+  isSensitive     Boolean @default(false)
 
-  sources         ContentSource[]
 }
 
 model Book {
@@ -330,7 +349,6 @@ model Book {
   rights        String?
   purchaseUrl   String?
 
-  sources       ContentSource[]
 }
 
 model Manuscript {
@@ -365,7 +383,6 @@ model Proverb {
   createdBy String?
   reviewedBy String?
   publishedBy String?
-  sources ContentSource[]
 }
 
 model VocabularyTerm {
@@ -388,7 +405,8 @@ model VocabularyTerm {
   createdBy String?
   reviewedBy String?
   publishedBy String?
-  sources   ContentSource[]
+
+  occurrences TermOccurrence[]
 }
 
 model Horse {
@@ -420,7 +438,6 @@ model HorseBreed {
   photos         String?
 
   horse Horse @relation(fields: [horseId], references: [id], onDelete: Cascade)
-  sources ContentSource[]
 }
 
 model Camel {
@@ -452,7 +469,6 @@ model CamelBreed {
   photos       String?
 
   camel Camel @relation(fields: [camelId], references: [id], onDelete: Cascade)
-  sources ContentSource[]
 }
 
 model Falcon {
@@ -543,7 +559,6 @@ model Category {
   isVisible   Boolean @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  contentTags ContentTag[]
 }
 
 model Tag {
@@ -583,6 +598,11 @@ model Source {
   updatedAt   DateTime @updatedAt
   isActive    Boolean @default(true)
   contentSources ContentSource[]
+  passageSources PassageSource[]
+  narrations     Narration[]
+  timelineEvents TimelineEvent[]
+  lineageAsSource SourceLineage[] @relation("SourceLineageSource")
+  lineageAsParent SourceLineage[] @relation("SourceLineageParent")
 }
 
 model ContentSource {
@@ -702,6 +722,8 @@ model Question {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   answers     Answer[]
+
+  creator     User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 }
 
 model Answer {
@@ -901,4 +923,205 @@ model RefreshToken {
   createdAt   DateTime @default(now())
   replacedBy  String?
   user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// =========================================================
+// شبكة المعرفة والبنية التوسعية لمنصة رواية التراث
+// النماذج التالية تؤسس للبنية التقنية التي تستوعب مستقبلًا:
+// شبكة المعرفة، بطاقة الثقة، التوثيق على مستوى الفقرة،
+// شجرة المصادر، مقارنة الروايات، رحلة المحتوى والخط الزمني،
+// معجم الكلمات القابل للنقر، وأرشيف الرواة الشفهي.
+// حتى لو لم تُبنَ كل واجهات الاستخدام في هذه المرحلة، البنية
+// جاهزة لاستيعابها دون إعادة هيكلة قاعدة البيانات.
+// =========================================================
+
+// شبكة المعرفة: يربط أي عنصر (قصيدة، شاعر، مكان، حدث، مصدر...)
+// بأي عنصر آخر عبر علاقة موصوفة (relationType نصي مفتوح لمرونة كاملة).
+model EntityRelation {
+  id           String   @id @default(cuid())
+  sourceType   ContentType
+  sourceId     String
+  targetType   ContentType
+  targetId     String
+  relationType String   // مثال: شاعر، قصة_القصيدة، مكان_مذكور، عاصر، نافس، مدح، هجا، روى_عنه، تعلم_منه
+  label        String?  // نص عربي يُعرض للمستخدم عند التنقل بين العلاقات
+  note         String?
+  confidence   VerificationLevel @default(UNDER_REVIEW)
+  createdBy    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([sourceType, sourceId])
+  @@index([targetType, targetId])
+  @@index([relationType])
+}
+
+// بطاقة الثقة: تقييم منفصل لكل عنصر محتوى يوضح درجة الثقة وسببها
+// ومصادرها ومدى الاتفاق أو الاختلاف عليها، بدل الاكتفاء بكلمة "موثّق".
+model TrustAssessment {
+  id                     String   @id @default(cuid())
+  contentType            ContentType
+  contentId              String
+  score                  Int      // 0-100
+  reasoning              String
+  sourceCount            Int      @default(0)
+  sourceStrength         String?
+  hasConflictingSources  Boolean  @default(false)
+  isOralNarration        Boolean  @default(false)
+  consensusStatus        ConsensusStatus @default(AGREED)
+  lastReviewedAt         DateTime?
+  nextReviewAt           DateTime?
+  reviewedById           String?
+  reviewedByName         String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  reviewedBy User? @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@unique([contentType, contentId])
+}
+
+// التوثيق على مستوى الفقرة: يقسّم أي عنصر محتوى إلى وحدات أصغر
+// (فقرة/بيت شعر/ادعاء) قابلة لامتلاك مصدر وشرح وملاحظة مستقلة.
+model Passage {
+  id              String   @id @default(cuid())
+  contentType     ContentType
+  contentId       String
+  kind            PassageKind @default(PARAGRAPH)
+  orderIndex      Int      @default(0)
+  text            String
+  explanation     String?
+  occasion        String?
+  difficultyWords Json?
+  note            String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sources         PassageSource[]
+  termOccurrences TermOccurrence[]
+  narrations      Narration[]
+
+  @@index([contentType, contentId])
+}
+
+model PassageSource {
+  id        String   @id @default(cuid())
+  passageId String
+  sourceId  String
+  note      String?
+  createdAt DateTime @default(now())
+
+  passage Passage @relation(fields: [passageId], references: [id], onDelete: Cascade)
+  source  Source  @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([passageId])
+  @@index([sourceId])
+}
+
+// شجرة المصادر: سلسلة انتقال المعلومة من مصدر إلى المصدر الذي نُقلت عنه.
+model SourceLineage {
+  id               String   @id @default(cuid())
+  sourceId         String
+  derivedFromId    String?
+  transmissionType String   // نقل_عن / مخطوطة / رواية_شفوية / طبعة
+  note             String?
+  createdAt        DateTime @default(now())
+
+  source      Source  @relation("SourceLineageSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  derivedFrom Source? @relation("SourceLineageParent", fields: [derivedFromId], references: [id], onDelete: SetNull)
+
+  @@index([sourceId])
+  @@index([derivedFromId])
+}
+
+// مقارنة الروايات: عدة نسخ/روايات لنفس القصيدة أو القصة أو الحدث
+// (أو لفقرة محددة عبر passageId) مع مصدر ودرجة ثقة لكل رواية.
+model Narration {
+  id                String   @id @default(cuid())
+  contentType       ContentType
+  contentId         String
+  passageId         String?
+  label             String
+  body              String
+  differenceNote    String?
+  sourceId          String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  passage Passage? @relation(fields: [passageId], references: [id], onDelete: SetNull)
+  source  Source?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@index([contentType, contentId])
+}
+
+// الخط الزمني: يخدم كلًا من "رحلة القصيدة" (category = TRANSMISSION)
+// و"الخط الزمني" العام لأي شخصية أو مكان أو حدث (category = BIOGRAPHICAL/HISTORICAL).
+model TimelineEvent {
+  id          String   @id @default(cuid())
+  subjectType ContentType
+  subjectId   String
+  category    String   // BIOGRAPHICAL | HISTORICAL | TRANSMISSION | GENERAL
+  title       String
+  eventDate   String?
+  era         String?
+  actorName   String?  // لمن قام بالحدث عند نوع النقل (راوٍ/شارح/ناسخ)
+  description String?
+  sourceId    String?
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  source Source? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@index([subjectType, subjectId])
+}
+
+// معجم الكلمات القديمة: يربط كلمة في المعجم بكل موضع ظهرت فيه
+// داخل المحتوى، ليصبح النقر عليها ممكنًا من واجهة القراءة.
+model TermOccurrence {
+  id          String   @id @default(cuid())
+  termId      String
+  contentType ContentType
+  contentId   String
+  passageId   String?
+  createdAt   DateTime @default(now())
+
+  term    VocabularyTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+  passage Passage?       @relation(fields: [passageId], references: [id], onDelete: SetNull)
+
+  @@index([contentType, contentId])
+  @@index([termId])
+}
+
+// أرشيف الرواة: توثيق الروايات الشفهية المسجّلة صوتيًا.
+model Narrator {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  fullName  String
+  bio       String?
+  region    String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recordings Recording[]
+}
+
+model Recording {
+  id                String   @id @default(cuid())
+  narratorId        String
+  title             String
+  recordedAt        DateTime?
+  recordingLocation String?
+  consentGiven      Boolean  @default(false)
+  audioUrl          String?
+  transcript        String?
+  difficultWords    Json?
+  category          String?
+  status            ContentStatus @default(DRAFT)
+  verificationLevel VerificationLevel @default(ORAL)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  narrator Narrator @relation(fields: [narratorId], references: [id], onDelete: Cascade)
 }
