@@ -424,8 +424,9 @@ class _OfflineChapterPageState extends State<OfflineChapterPage> {
                     style: TextStyle(
                       fontSize: _fontSize,
                       height: 1.7,
-                      color: fg
-                          .withOpacity(_bodyController.text.isEmpty ? 0.6 : 1),
+                      color: fg.withValues(
+                        alpha: _bodyController.text.isEmpty ? 0.6 : 1,
+                      ),
                     ),
                   ),
                 ],

@@ -47,6 +47,7 @@ Future<void> _captureDevice(
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
+  // ignore: invalid_use_of_visible_for_testing_member
   SharedPreferences.setMockInitialValues({});
   await _pumpApp(tester);
   await _saveScreenshot(
