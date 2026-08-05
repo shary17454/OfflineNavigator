@@ -2,6 +2,8 @@ name: Mawrooth CI
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "rawayah/**"
       - ".github/workflows/rawaya-ci.yml"
