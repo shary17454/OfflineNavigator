@@ -1,13 +1,13 @@
 # جاهزية App Store
 
-هذه مراجعة مصدر وليست شهادة قبول من Apple. لم يُبنَ أو يُرفع أي تطبيق أثناء إعدادها. راجع قواعد الهوية في [`AGENTS.md`](../AGENTS.md)، وعملية الإصدار في [`release-process.md`](release-process.md)، وحقائق Xcode Cloud لرواية التراث في [`RAWAYA_XCODE_CLOUD.md`](RAWAYA_XCODE_CLOUD.md).
+هذه مراجعة مصدر وليست شهادة قبول من Apple. لم يُبنَ أو يُرفع أي تطبيق أثناء إعدادها. راجع قواعد الهوية في [`AGENTS.md`](../AGENTS.md)، وعملية الإصدار في [`release-process.md`](release-process.md)، وحقائق Xcode Cloud لمنصة موروث في [`RAWAYA_XCODE_CLOUD.md`](RAWAYA_XCODE_CLOUD.md).
 
 ## حالة سريعة
 
 | المنتج | جاهزية مؤكدة من المصدر | مانع/فجوة حالية |
 | --- | --- | --- |
 | مدّل | Bundle/Team/category/usage strings/privacy manifest/scheme وApp Icon موجودة | تعارض 1.0 مقابل README 1.1؛ App Store record وKVS provisioning غير مثبتين؛ يلزم Validate Archive للأيقونة |
-| رواية التراث | App ID `6797734164` وBundle/Team/workspace/scheme وملفات App Icon موثقة | لا Privacy Manifest؛ endpoint تطوير HTTP؛ ميزات placeholders؛ أول Xcode Cloud workflow غير مثبت؛ يلزم Validate Archive للأيقونات |
+| موروث (Rawaya) | App ID `6797734164` وBundle/Team/workspace/scheme وملفات App Icon موثقة | لا Privacy Manifest؛ endpoint تطوير HTTP؛ ميزات placeholders؛ أول Xcode Cloud workflow غير مثبت؛ يلزم Validate Archive للأيقونات |
 | موروث | Bundle/Team/category/privacy manifest/scheme وApp Icon موجودة | لا App Store Connect App ID أو Xcode Cloud موثق؛ يلزم Validate Archive للأيقونة |
 
 أي مانع في الجدول يعني **غير جاهز للإرسال** حتى يُغلق ويُتحقق من Archive فعلي.
@@ -37,7 +37,7 @@
 - [ ] App Privacy answers تطابق البيانات الفعلية وSDKs، لا Privacy Manifest فقط.
 - [ ] Required Reason APIs لكل التطبيق وdependencies مغطاة في `PrivacyInfo.xcprivacy`.
 - [ ] usage descriptions واضحة ومطابقة لوقت طلب الإذن.
-- [ ] `ITSAppUsesNonExemptEncryption` وإجابات export compliance موثقة؛ المشاريع الحالية تضبطه `false` لمدّل وموروث، ويجب حسمه لرواية التراث.
+- [ ] `ITSAppUsesNonExemptEncryption` وإجابات export compliance موثقة؛ المشاريع الحالية تضبطه `false` لمدّل وتطبيق SwiftUI، ويجب حسمه لمنصة موروث.
 - [ ] لا أسرار أو seed passwords أو logging لبيانات شخصية في البناء.
 - [ ] روابط حذف الحساب مطلوبة إذا أصبح إنشاء الحساب متاحًا؛ شاشة auth placeholder لا تبرر الادعاء بوجود حسابات.
 
@@ -71,11 +71,11 @@
 - [ ] اختبر وضع الطيران: لا تدّع أن Apple Map offline؛ الوصف الصحيح أن الشبكة والإحداثيات والحسابات تعمل بلا بلاطات.
 - [ ] قدّم تنبيهًا واضحًا أن التطبيق لا يحل محل وسائل السلامة/الملاحة المعتمدة إن كان وصف المتجر يوحي بذلك.
 
-## رواية التراث
+## موروث (Rawaya)
 
 ### هوية مؤكدة
 
-- App Store Connect name: **رواية التراث**.
+- App Store Connect name: **موروث**.
 - Numeric App ID: `6797734164`.
 - Bundle ID: `com.shary17454.rawaya`; Display Name مطابق؛ Team `4HM66AD594`.
 - مسار CI والصفحة موثقان في [`RAWAYA_XCODE_CLOUD.md`](RAWAYA_XCODE_CLOUD.md)، لكن نجاح Workflow/Archive غير مثبت في المصدر.
@@ -114,7 +114,7 @@
 
 - [ ] تحقق عبر Release Archive من `Riwaya/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` ومن الألوان/alpha.
 - [ ] أنشئ/تحقق من App Store record والـnumeric App ID؛ لا قيمة موثقة حاليًا.
-- [ ] لا تستخدم `docs/MAWROOTH_XCODE_CLOUD.md` كإثبات؛ محتواه يحيل إلى App ID رواية التراث.
+- [ ] لا تستخدم `docs/MAWROOTH_XCODE_CLOUD.md` كإثبات لتطبيق SwiftUI؛ محتواه يحيل إلى App ID منصة موروث.
 - [ ] تحقق من صحة إجابة «Data Not Collected» بعد فحص كل binary/SDK في Archive.
 - [ ] اختبر حفظ Core Data والترقية وعدم فقد الروايات والفصول.
 - [ ] اختبر تصدير نص عربي واتجاهه وترميزه في Files/Mail/Share Sheet.

@@ -12,7 +12,7 @@
 | المنتج | المسار / المشروع | Bundle ID | الغرض |
 | --- | --- | --- | --- |
 | **مدّل** (Offline Navigator) | `OfflineNavigator.xcodeproj` | `com.shary17454.OfflineCoordinateNavigator` | ملاحة إحداثيات ميدانية دون اتصال |
-| **رواية التراث** (Rawaya) | `rawayah/` | `com.shary17454.rawaya` | منصة تراث عربي (API + Web + Admin + Flutter) — تطبيق ASC App ID `6797734164` |
+| **موروث** (Rawaya platform) | `rawayah/` | `com.shary17454.rawaya` | منصة تراث عربي (API + Web + Admin + Flutter) — تطبيق ASC App ID `6797734164` |
 | **موروث** (Riwaya SwiftUI) | `Riwaya.xcodeproj` | `com.shary17454.Riwaya` | دفتر روايات محلي iOS أصلي (مكمّل لفكرة الدفتر دون اتصال في Flutter) |
 
 لا تخلط نطاقات المنتجات: خطأ في مدّل لا يُصلح بتغيير Prisma، والعكس.
@@ -24,7 +24,7 @@
 ### مدّل
 حفظ نقاط GPS، حساب المسافة والاتجاه محليًا، بوصلة، خريطة Apple أو شبكة دون بلاطات، GPX استيراد/تصدير، مشاركة روابط خرائط، نسخ احتياطي اختياري عبر `NSUbiquitousKeyValueStore`.
 
-### رواية التراث (`rawayah/`)
+### موروث (`rawayah/`)
 منصة محتوى تراثي (شعر، قصص، كتب، خيل، إبل، صقارة، …) مع NestJS/Prisma، واجهات Next، وتطبيق Flutter. يتضمن **دفتر دون اتصال** محليًا في Flutter مستوحى من تطبيق Riwaya.
 
 ### موروث (SwiftUI)
@@ -40,7 +40,7 @@
 - **ليست** MVVM صارمة؛ منطق الأعمال غالبًا في الشاشة الجذر (`ContentView` لمدّل، `LibraryView` لموروث)
 - حالة: `@StateObject` / `@FetchRequest` / `@AppStorage` / `@State`
 
-### رواية التراث
+### موروث (Rawaya platform)
 - Monorepo npm workspaces: `apps/api|web|admin|mobile` + `packages/*` (حاليًا placeholders)
 - API: Nest modules تحت `apps/api/src/modules/*`
 - Mobile: Riverpod + go_router + Dio؛ معظم المسارات ما زالت `PlaceholderPage`
@@ -70,7 +70,7 @@
 - لا تحدّث dependencies أو ترفع Deployment Target دون طلب.
 - لا تستخدم أوامر Git مدمرة (`reset --hard`, `clean -fd`, force push, …).
 - لا تلمس تعديلات Uncommitted ليست لك.
-- ميّز بين: مدّل (ملاحة) ≠ رواية التراث (منصة) ≠ موروث SwiftUI (دفتر).
+- ميّز بين: مدّل (ملاحة) ≠ منصة موروث في `rawayah/` ≠ تطبيق موروث SwiftUI في `Riwaya/`.
 - اللغة العربية وRTL إلزامية في واجهات رواية/موروث؛ مدّل حاليًا مختلط AR/EN — لا توسّع الترجمة إلا بطلب.
 
 ---
@@ -180,7 +180,7 @@
 ## 16) قواعد الإصدار
 
 - مدّل: وثّق التناقض الحالي README يقول 1.1 بينما `MARKETING_VERSION=1.0` — لا «تصلح» الإصدار عرضًا.
-- رواية التراث: اتبع [docs/RAWAYA_XCODE_CLOUD.md](docs/RAWAYA_XCODE_CLOUD.md) وASC App `6797734164`.
+- منصة موروث: اتبع [docs/RAWAYA_XCODE_CLOUD.md](docs/RAWAYA_XCODE_CLOUD.md) وASC App `6797734164`.
 - لا Submit للمراجعة / TestFlight من الوكيل ما لم تتوفر أدوات Apple ويُطلب صراحة.
 
 ---
@@ -218,7 +218,7 @@
 | [docs/app-store-readiness.md](docs/app-store-readiness.md) | جاهزية المتجر |
 | [docs/maintenance.md](docs/maintenance.md) | الصيانة والديون المعروفة |
 | [docs/rawayah-platform.md](docs/rawayah-platform.md) | منصة Nest/Next/Flutter |
-| [docs/RAWAYA_XCODE_CLOUD.md](docs/RAWAYA_XCODE_CLOUD.md) | Xcode Cloud لرواية التراث |
+| [docs/RAWAYA_XCODE_CLOUD.md](docs/RAWAYA_XCODE_CLOUD.md) | Xcode Cloud لمنصة موروث |
 | [docs/RAWAYA_MERGE.md](docs/RAWAYA_MERGE.md) | سجل دمج Codex |
 
 صفحات الدعم العامة للمستخدم النهائي تبقى تحت `docs/index.html` و`docs/riwaya/` — ليست دليلًا هندسيًا للوكلاء.

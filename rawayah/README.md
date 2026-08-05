@@ -1,10 +1,10 @@
-# رواية التراث (Rawaya)
+# موروث (Rawaya)
 
 منصة رقمية عربية لحفظ وصون التراث العربي والبدوي.
 
 > المسار: `rawayah/`  
 > Bundle ID المسجّل في Apple: `com.shary17454.rawaya`  
-> اسم App Store Connect: **رواية التراث** (App ID `6797734164`)
+> اسم App Store Connect: **موروث** (App ID `6797734164`)
 
 ## المتطلبات
 - Node.js 20+

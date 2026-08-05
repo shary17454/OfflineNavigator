@@ -27,14 +27,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('رواية التراث')),
+      appBar: AppBar(title: const Text('موروث')),
       body: Directionality(
         textDirection: TextDirection.rtl,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const Text(
-              'رواية… ذاكرة التراث العربي',
+              'موروث… ذاكرة التراث العربي',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -66,18 +66,18 @@ class _HomePageState extends State<HomePage> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.info_outline),
-                title: const Text('عن رواية التراث'),
+                title: const Text('عن موروث'),
                 subtitle: const Text('الإصدار 0.1.0 — MVP'),
                 onTap: () {
                   showAboutDialog(
                     context: context,
-                    applicationName: 'رواية التراث',
+                    applicationName: 'موروث',
                     applicationVersion: '0.1.0',
-                    applicationLegalese: 'منصة رواية التراث العربي',
+                    applicationLegalese: 'منصة موروث للتراث العربي',
                     children: const [
                       SizedBox(height: 12),
                       Text(
-                        'رواية التراث تجمع محتوى التراث مع دفتر محلي للمساهمات دون اتصال، استعدادًا للربط الكامل مع الخادم.',
+                        'موروث يجمع محتوى التراث مع دفتر محلي للمساهمات دون اتصال، استعدادًا للربط الكامل مع الخادم.',
                       ),
                     ],
                   );

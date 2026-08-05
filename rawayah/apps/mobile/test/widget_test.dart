@@ -7,6 +7,6 @@ void main() {
   testWidgets('Rawaya app renders splash screen', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: RawayaApp()));
 
-    expect(find.text('رواية… ذاكرة التراث العربي'), findsOneWidget);
+    expect(find.text('موروث… ذاكرة التراث العربي'), findsOneWidget);
   });
 }

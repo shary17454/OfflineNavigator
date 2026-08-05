@@ -126,7 +126,7 @@ Shared infrastructure should be genuinely cross-module before entering `src/shar
 
 ## Naming and identity traps
 
-- `Riwaya/` is the native app branded “موروث” in its UI; `rawayah/` is “رواية التراث.” Historical documents use both Riwaya/Rawaya/Mawrooth spellings.
+- `Riwaya/` and `rawayah/` are distinct products currently branded “موروث” in their UI; use their paths and Bundle IDs to disambiguate them. Historical documents use Riwaya/Rawaya/Mawrooth spellings.
 - `OfflineNavigator` is the target/module name; the user-facing alert title is “مدّل.”
 - Rawaya Flutter’s iOS bundle ID is `com.shary17454.rawaya`; the native Mawrooth bundle ID is `com.shary17454.Riwaya`.
 - Do not rename targets, folders, bundle IDs, schemes, or Apple team settings as a cleanup.

@@ -8,7 +8,7 @@ This directory documents the code that is currently checked into this multi-prod
 | --- | --- | --- |
 | **Madall / مدّل** | [`../OfflineNavigator/`](../OfflineNavigator/) and `OfflineNavigator.xcodeproj` | Native iOS 17+ SwiftUI coordinate navigator. Core Data owns waypoints; `LocationMotionManager` supplies location, heading, and device motion; `GPXService` imports/exports GPX; `ICloudBackupService` optionally mirrors snapshots to iCloud KVS. |
 | **Mawrooth / موروث** | [`../Riwaya/`](../Riwaya/) and `Riwaya.xcodeproj` | Native iOS 17+ Arabic RTL notebook. Core Data owns `Novel` and `Chapter`; `LibraryView`, `ChapterEditorView`, and `ReaderView` implement local writing and reading. |
-| **Rawaya heritage platform / رواية التراث** | [`../rawayah/`](../rawayah/) | npm workspaces with a NestJS/Prisma API, two Next.js Pages Router clients, and a Flutter mobile MVP. Most Flutter routes are placeholders; the implemented offline notebook stores one JSON document in `SharedPreferences`. |
+| **Rawaya heritage platform / موروث** | [`../rawayah/`](../rawayah/) | npm workspaces with a NestJS/Prisma API, two Next.js Pages Router clients, and a Flutter mobile MVP. Most Flutter routes are placeholders; the implemented offline notebook stores one JSON document in `SharedPreferences`. |
 
 These products share a repository and Apple team, but not data models, runtime state, or release lifecycle. `Waypoint`, `Novel`, Prisma `Poem`, and Flutter `OfflineWork` are separate sources of truth.
 

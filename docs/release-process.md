@@ -1,13 +1,13 @@
 # عملية الإصدار
 
-هذه العملية مبنية على إعدادات المستودع الحالية. اتبع قيود [`AGENTS.md`](../AGENTS.md)، ولرواية التراث اتبع كذلك [`RAWAYA_XCODE_CLOUD.md`](RAWAYA_XCODE_CLOUD.md). لا تغيّر Bundle ID أو Team أو أرقام الإصدار ضمن إصلاح عابر.
+هذه العملية مبنية على إعدادات المستودع الحالية. اتبع قيود [`AGENTS.md`](../AGENTS.md)، ولمنصة موروث اتبع كذلك [`RAWAYA_XCODE_CLOUD.md`](RAWAYA_XCODE_CLOUD.md). لا تغيّر Bundle ID أو Team أو أرقام الإصدار ضمن إصلاح عابر.
 
 ## هويات الإصدار الفعلية
 
 | المنتج | المشروع / Workspace | Scheme | Bundle ID | Team | iOS | الإصدار في المصدر |
 | --- | --- | --- | --- | --- | --- | --- |
 | مدّل | `OfflineNavigator.xcodeproj` | `OfflineNavigator` | `com.shary17454.OfflineCoordinateNavigator` | `4HM66AD594` | 17.0 | `MARKETING_VERSION=1.0`, build `2` |
-| رواية التراث | `rawayah/apps/mobile/ios/Runner.xcworkspace` | `Runner` | `com.shary17454.rawaya` | `4HM66AD594` | 13.0 | `rawayah/apps/mobile/pubspec.yaml`: `0.1.0+1`; Xcode يأخذ `FLUTTER_BUILD_NAME/NUMBER` |
+| موروث (Rawaya) | `rawayah/apps/mobile/ios/Runner.xcworkspace` | `Runner` | `com.shary17454.rawaya` | `4HM66AD594` | 13.0 | `rawayah/apps/mobile/pubspec.yaml`: `0.1.0+1`; Xcode يأخذ `FLUTTER_BUILD_NAME/NUMBER` |
 | موروث | `Riwaya.xcodeproj` | `Riwaya` | `com.shary17454.Riwaya` | `4HM66AD594` | 17.0 | `MARKETING_VERSION=1.0`, build `1` |
 
 كل schemes الثلاثة shared وتسمح بالـArchive. أهداف الاختبار هي `OfflineNavigatorTests`, `RunnerTests`, و`RiwayaTests`.
@@ -59,11 +59,11 @@ xcodebuild archive \
 - البوصلة والمسافة والاتجاه والتنبيه عند الاقتراب.
 - نسخ iCloud واستعادة النقاط على حساب مؤهل، مع التأكد أن الفشل لا يمس Core Data.
 
-## رواية التراث
+## موروث (Rawaya)
 
 ### حقائق Xcode Cloud
 
-- App Store Connect: **رواية التراث**، App ID `6797734164`.
+- App Store Connect: **موروث**، App ID `6797734164`.
 - صفحة CI المسجلة موجودة في [`RAWAYA_XCODE_CLOUD.md`](RAWAYA_XCODE_CLOUD.md).
 - Workspace `rawayah/apps/mobile/ios/Runner.xcworkspace` وScheme `Runner`.
 - `ci_scripts/` في الجذر يفوض إلى `rawayah/apps/mobile/ios/ci_scripts/`.
@@ -116,7 +116,7 @@ flutter build ios --release --no-codesign
 - تحقق من `Riwaya/PrivacyInfo.xcprivacy`: لا tracking/collection ويعلن UserDefaults reason `CA92.1`.
 - التطبيق محلي بلا شبكة بحسب الكود؛ أي إضافة شبكة تستلزم مراجعة الخصوصية والـmetadata.
 - تحقق عبر Release Archive من `Riwaya/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` الموجود ومن نجاح asset compilation.
-- لا يوجد دليل مستودع على App Store Connect App ID أو Xcode Cloud workflow لموروث. `docs/MAWROOTH_XCODE_CLOUD.md` يحيل فعليًا إلى هوية **رواية التراث** ولا يثبت هوية موروث.
+- لا يوجد دليل مستودع على App Store Connect App ID أو Xcode Cloud workflow لتطبيق SwiftUI في `Riwaya/`. `docs/MAWROOTH_XCODE_CLOUD.md` يحيل فعليًا إلى هوية منصة **موروث** في `rawayah/` ولا يثبت هوية تطبيق SwiftUI.
 
 ### أوامر مرجعية على macOS
 

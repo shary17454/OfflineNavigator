@@ -1,6 +1,6 @@
 # Rawaya heritage platform
 
-This page covers only [`../rawayah/`](../rawayah/), the “رواية التراث” platform. It is not the native Mawrooth app in `Riwaya/`. See [`architecture.md`](architecture.md) for repository boundaries and [`../rawayah/docs/`](../rawayah/docs/) for existing domain-specific design notes.
+This page covers only [`../rawayah/`](../rawayah/), the “موروث” Rawaya platform. It is not the separate native Mawrooth app in `Riwaya/`. See [`architecture.md`](architecture.md) for repository boundaries and [`../rawayah/docs/`](../rawayah/docs/) for existing domain-specific design notes.
 
 ## Implemented stack
 

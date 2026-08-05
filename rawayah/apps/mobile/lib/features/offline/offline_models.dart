@@ -119,7 +119,7 @@ class OfflineLibraryStore {
       title: 'ظل على الرمال',
       authorName: 'مساهمة تجريبية',
       genre: 'قصة',
-      synopsis: 'نص تجريبي محلي للقراءة والكتابة دون اتصال داخل تطبيق رواية التراث.',
+      synopsis: 'نص تجريبي محلي للقراءة والكتابة دون اتصال داخل تطبيق موروث.',
       updatedAt: DateTime.now(),
       isFavorite: true,
       chapters: [

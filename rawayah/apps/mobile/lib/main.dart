@@ -116,7 +116,7 @@ class RawayaApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
-      title: 'رواية التراث',
+      title: 'موروث',
       routerConfig: router,
       theme: ThemeData(
         fontFamily: 'Tajawal',
@@ -139,7 +139,7 @@ class SplashPage extends StatelessWidget {
       body: Center(
         child: FilledButton(
           onPressed: () => context.goNamed('home'),
-          child: const Text('رواية… ذاكرة التراث العربي'),
+          child: const Text('موروث… ذاكرة التراث العربي'),
         ),
       ),
     );
