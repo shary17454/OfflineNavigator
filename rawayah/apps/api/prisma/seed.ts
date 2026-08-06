@@ -47,6 +47,7 @@ async function main() {
     upsertPermission('users:manage', 'إدارة المستخدمين والأدوار'),
     upsertPermission('settings:manage', 'إدارة إعدادات النظام'),
     upsertPermission('questions:answer_official', 'تمييز إجابة كإجابة رسمية من المالك'),
+    upsertPermission('analytics:view', 'عرض التحليلات الأساسية'),
   ]);
 
   const findPerm = (code: string) => perms.find((p) => p.code === code)!;

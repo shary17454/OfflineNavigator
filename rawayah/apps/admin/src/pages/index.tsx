@@ -14,6 +14,8 @@ export default function AdminHome() {
         <Link href="/rights">الحقوق</Link> |
         <Link href="/relations">العلاقات</Link> |
         <Link href="/settings">الإعدادات</Link> |
+        <Link href="/analytics">التحليلات</Link> |
+        <Link href="/backups">النسخ الاحتياطية</Link> |
         <Link href="/logs">سجل المراجعة</Link> |
         <Link href="/login">تسجيل دخول الإدارة</Link>
       </section>

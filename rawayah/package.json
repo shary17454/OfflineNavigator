@@ -22,7 +22,9 @@
     "test:admin": "WATCHMAN_DISABLE=1 CHOKIDAR_USEPOLLING=1 npm run -w @rawaya/admin test -- --passWithNoTests --watchman=false",
     "lint": "npm run -w @rawaya/api lint && npm run -w @rawaya/web lint && npm run -w @rawaya/admin lint",
     "docker:dev": "docker-compose up -d",
-    "docker:prod": "docker-compose -f docker-compose.production.yml up -d"
+    "docker:prod": "docker-compose -f docker-compose.production.yml up -d",
+    "db:backup": "bash scripts/backup.sh",
+    "db:restore": "bash scripts/restore.sh"
   },
   "devDependencies": {
     "eslint": "^8.57.0"

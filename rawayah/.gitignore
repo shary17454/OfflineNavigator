@@ -22,3 +22,4 @@ apps/api/prisma/*.js
 apps/api/prisma/*.js.map
 apps/api/prisma/*.d.ts
 *.js.map
+backups/*.sql.gz

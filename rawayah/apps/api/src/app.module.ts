@@ -19,6 +19,7 @@ import { IngestionModule } from './modules/ingestion/ingestion.module';
 import { SourcesModule } from './modules/sources/sources.module';
 import { RightsModule } from './modules/rights/rights.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { SettingsModule } from './modules/settings/settings.module';
     SourcesModule,
     RightsModule,
     SettingsModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}
