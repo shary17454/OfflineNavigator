@@ -36,9 +36,13 @@ export class MediaController {
   @ApiConsumes('multipart/form-data')
   @Permissions('content:create')
   @UseGuards(PermissionGuard)
-  async upload(@CurrentUser() user: any, @UploadedFile() file: UploadedFile, @Body() body: { contentType: string; contentId: string; contentCategory: 'audio' | 'video' }) {
+  async upload(
+    @CurrentUser() user: any,
+    @UploadedFile() file: UploadedFile,
+    @Body() body: { contentType: string; contentId: string; contentCategory: 'audio' | 'video'; isPrivate?: boolean | string },
+  ) {
     if (!file) throw new ForbiddenException('الملف مطلوب');
-    return this.media.upload(user.id, file, body);
+    return this.media.upload(user.id, file, { ...body, isPrivate: body.isPrivate === true || body.isPrivate === 'true' });
   }
 
   @Get(':id')
