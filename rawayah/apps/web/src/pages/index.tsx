@@ -36,7 +36,15 @@ export default function Home() {
         <Link href="/media/audio-player">مشغل الصوت</Link>
         <Link href="/video-player">مشغل الفيديو</Link>
         <Link href="/questions">الأسئلة</Link>
+        <Link href="/account">حسابي</Link>
+        <Link href="/login">تسجيل الدخول</Link>
       </section>
+      <footer>
+        <Link href="/about">من نحن</Link>
+        <Link href="/contact">تواصل معنا</Link>
+        <Link href="/privacy">سياسة الخصوصية</Link>
+        <Link href="/terms">شروط الاستخدام</Link>
+      </footer>
     </main>
   );
 }
