@@ -11,16 +11,35 @@ function randomPassword(length = 20) {
   return crypto.randomBytes(length).toString('base64url').slice(0, length);
 }
 
-async function prompt(question: string): Promise<string> {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  try {
-    return (await rl.question(question)).trim();
-  } finally {
-    rl.close();
+// عند تمرير الإدخال عبر أنبوب (pipe) بدل طرفية تفاعلية حقيقية، تُغلق واجهة
+// readline نفسها تلقائيًا فور انتهاء الدفق — قبل أن يصل السؤال الثاني. نقرأ
+// كل الأسطر مسبقًا في هذه الحالة ونسحب الإجابات منها بدل استدعاء rl.question()
+// المتكرر. الاستخدام التفاعلي العادي (طرفية حقيقية) لا يتأثر ويستمر كما هو.
+let pipedLines: string[] | null = null;
+let rl: readline.Interface | null = null;
+
+async function initInput() {
+  if (!process.stdin.isTTY) {
+    const chunks: Buffer[] = [];
+    for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
+    pipedLines = Buffer.concat(chunks).toString('utf8').split('\n');
+  } else {
+    rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   }
 }
 
+async function prompt(question: string): Promise<string> {
+  if (pipedLines) {
+    const line = (pipedLines.shift() ?? '').trim();
+    process.stdout.write(`${question}${line}\n`);
+    return line;
+  }
+  return (await rl!.question(question)).trim();
+}
+
 async function main() {
+  await initInput();
+
   const existingOwner = await prisma.userRole.findFirst({
     where: { role: { code: 'OWNER' } },
   });
@@ -90,6 +109,9 @@ async function main() {
 main()
   .catch((err) => {
     console.error(err);
-    process.exit(1);
+    process.exitCode = 1;
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    rl?.close();
+    await prisma.$disconnect();
+  });

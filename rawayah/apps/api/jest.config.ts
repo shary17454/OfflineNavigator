@@ -1,7 +1,7 @@
 export default {
   testEnvironment: 'node',
   roots: ['<rootDir>/test'],
-  testMatch: ['**/*.spec.ts'],
+  testMatch: ['**/*.spec.ts', '**/*.e2e-spec.ts'],
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },

@@ -11,6 +11,7 @@
     "lint": "eslint \"src/**/*.ts\"",
     "test": "WATCHMAN_DISABLE=1 CHOKIDAR_USEPOLLING=1 jest -c jest.config.ts --watchman=false",
     "test:watch": "jest --watch",
+    "test:live": "WATCHMAN_DISABLE=1 CHOKIDAR_USEPOLLING=1 RUN_LIVE_E2E=1 jest -c jest.config.ts --watchman=false",
     "seed": "tsx prisma/seed.ts",
     "create-owner": "tsx prisma/create-owner.ts"
   },
@@ -48,6 +49,7 @@
     "@types/node": "^20.11.30",
     "@types/passport-jwt": "^4.0.1",
     "@types/qrcode-terminal": "^0.12.2",
+    "@types/supertest": "^7.2.1",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "prisma": "^5.18.0",

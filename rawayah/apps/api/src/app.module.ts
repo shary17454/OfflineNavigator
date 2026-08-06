@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
-import { PermissionGuard } from './shared/common/roles.guard';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -37,12 +35,6 @@ import { IngestionModule } from './modules/ingestion/ingestion.module';
     SuggestionsModule,
     ModerationModule,
     IngestionModule,
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: PermissionGuard,
-    },
   ],
 })
 export class AppModule {}
