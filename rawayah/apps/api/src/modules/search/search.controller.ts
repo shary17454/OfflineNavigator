@@ -1,8 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { SearchService } from './suggestions.service';
+import { SearchService } from './search.service';
 
 @Controller('search')
-export class SuggestionsController {
+export class SearchController {
   constructor(private readonly svc: SearchService) {}
 
   @Get('suggest')

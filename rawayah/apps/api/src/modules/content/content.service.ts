@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../shared/prisma/prisma.service';
+import { normalizeArabic } from '../../shared/common/arabic-normalize';
 import { ModerationService } from '../moderation/moderation.service';
 import { CreateCommentDto, CreatePoemDto, CreateQuestionDto, FavoriteDto, SearchDto } from './dto/content.dto';
 
@@ -225,13 +227,16 @@ export class ContentService {
 
   async search(qs: SearchDto) {
     const query = (qs.query || '').trim();
-    const normalized = query.replace(/[إأآ]/g, 'ا');
-    const filter = { contains: normalized, mode: 'insensitive' } as any;
+    const normalized = normalizeArabic(query);
+    const filter: Prisma.StringFilter = { contains: normalized, mode: 'insensitive' };
 
-    const base = { status: 'PUBLISHED', deletedAt: null } as any;
-    const wherePoem = query ? { ...base, OR: [{ title: filter }, { summary: filter }, { body: filter }] } : base;
-    const whereStory = query ? { ...base, OR: [{ title: filter }, { summary: filter }, { body: filter }] } : base;
-    const whereBook = query ? { ...base, OR: [{ title: filter }, { summary: filter }, { body: filter }] } : base;
+    const basePoem: Prisma.PoemWhereInput = { status: 'PUBLISHED', deletedAt: null };
+    const baseStory: Prisma.StoryWhereInput = { status: 'PUBLISHED', deletedAt: null };
+    const baseBook: Prisma.BookWhereInput = { status: 'PUBLISHED' };
+
+    const wherePoem: Prisma.PoemWhereInput = query ? { ...basePoem, OR: [{ title: filter }, { summary: filter }, { body: filter }] } : basePoem;
+    const whereStory: Prisma.StoryWhereInput = query ? { ...baseStory, OR: [{ title: filter }, { summary: filter }, { body: filter }] } : baseStory;
+    const whereBook: Prisma.BookWhereInput = query ? { ...baseBook, OR: [{ title: filter }, { summary: filter }, { body: filter }] } : baseBook;
 
     const [poems, stories, books] = await Promise.all([
       this.prisma.poem.findMany({ where: wherePoem, take: 20, orderBy: { createdAt: 'desc' } }),
