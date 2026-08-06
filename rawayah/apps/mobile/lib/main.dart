@@ -61,6 +61,42 @@ class RawayaRoutes {
         return 'المفضلة';
       case '/offline':
         return 'دفتر دون اتصال';
+      case '/profile':
+        return 'حسابي';
+      case '/reading-lists':
+        return 'المكتبة';
+      case '/poems':
+        return 'القصائد';
+      case '/stories':
+        return 'القصص';
+      case '/books':
+        return 'الكتب والمراجع';
+      case '/places':
+        return 'الأماكن والمعالم';
+      case '/horses':
+        return 'الخيل';
+      case '/camels':
+        return 'الإبل';
+      case '/hunting':
+        return 'الصقارة والقنص';
+      case '/hunting-dogs':
+        return 'كلاب الصيد';
+      case '/questions':
+        return 'الأسئلة';
+      case '/notifications':
+        return 'الإشعارات';
+      case '/settings':
+        return 'الإعدادات';
+      case '/subscriptions':
+        return 'الاشتراكات';
+      case '/privacy':
+        return 'الخصوصية';
+      case '/terms':
+        return 'الشروط';
+      case '/about':
+        return 'عن التطبيق';
+      case '/contact':
+        return 'تواصل معنا';
       default:
         return route.replaceFirst('/', '');
     }
