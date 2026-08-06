@@ -5,7 +5,20 @@ import { JwtAuthGuard } from '../../shared/common/jwt-auth.guard';
 import { PermissionGuard } from '../../shared/common/roles.guard';
 import { Permissions } from '../../shared/common/roles.decorator';
 import { ContentService } from './content.service';
-import { CreateCommentDto, CreatePoemDto, SearchDto, FavoriteDto, CreateQuestionDto, PublishDto, ReviewDto } from './dto/content.dto';
+import {
+  CreateAnswerDto,
+  CreateCommentDto,
+  CreatePoemAttributionDto,
+  CreatePoemDto,
+  CreatePoemVerseDto,
+  CreatePoemVerseVariantDto,
+  CreatePoemVersionDto,
+  SearchDto,
+  FavoriteDto,
+  CreateQuestionDto,
+  PublishDto,
+  ReviewDto,
+} from './dto/content.dto';
 
 @ApiTags('content')
 @Controller()
@@ -71,6 +84,43 @@ export class ContentController {
   @Post('poems/:id/submit')
   submitPoem(@Param('id') id: string) {
     return this.svc.submitPoem(id);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @ApiBearerAuth()
+  @Permissions('content:edit')
+  @Post('poems/:id/versions')
+  createPoemVersion(@Param('id') id: string, @CurrentUser() user: any, @Body() dto: CreatePoemVersionDto) {
+    return this.svc.createPoemVersion(id, dto, user.id);
+  }
+
+  @Get('poems/:id/versions')
+  poemVersions(@Param('id') id: string) {
+    return this.svc.listPoemVersions(id);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @ApiBearerAuth()
+  @Permissions('content:edit')
+  @Post('poems/versions/:versionId/verses')
+  createPoemVerse(@Param('versionId') versionId: string, @CurrentUser() user: any, @Body() dto: CreatePoemVerseDto) {
+    return this.svc.createPoemVerse(versionId, dto, user.id);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @ApiBearerAuth()
+  @Permissions('content:edit')
+  @Post('poems/verses/:verseId/variants')
+  createPoemVerseVariant(@Param('verseId') verseId: string, @CurrentUser() user: any, @Body() dto: CreatePoemVerseVariantDto) {
+    return this.svc.createPoemVerseVariant(verseId, dto, user.id);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @ApiBearerAuth()
+  @Permissions('content:edit')
+  @Post('poems/:id/attributions')
+  createPoemAttribution(@Param('id') id: string, @CurrentUser() user: any, @Body() dto: CreatePoemAttributionDto) {
+    return this.svc.createPoemAttribution(id, dto, user.id);
   }
 
   @Get('poems/admin/list')
@@ -147,8 +197,8 @@ export class ContentController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('questions/:id/answers')
-  answerQuestion(@CurrentUser() user: any, @Param('id') id: string, @Body() dto: { body: string; isOfficial?: boolean }) {
-    return this.svc.answerQuestion(id, user.id, dto.body, dto.isOfficial || false);
+  answerQuestion(@CurrentUser() user: any, @Param('id') id: string, @Body() dto: CreateAnswerDto) {
+    return this.svc.answerQuestion(id, user.id, dto.body);
   }
 
   @UseGuards(JwtAuthGuard)

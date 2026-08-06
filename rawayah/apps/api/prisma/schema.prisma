@@ -290,6 +290,7 @@ model Poet {
 
   poems         Poem[]
   stories       Story[]
+  attributions  PoemAttribution[]
   @@index([fullName])
 }
 
@@ -326,7 +327,8 @@ model Poem {
   ratingAverage Float? @default(0)
 
   poet          Poet @relation(fields: [poetId], references: [id], onDelete: Cascade)
-  verses        PoemVerse[]
+  versions      PoemVersion[]
+  attributions  PoemAttribution[]
 }
 
 model Story {
@@ -1242,10 +1244,32 @@ model OwnerBootstrapToken {
   createdAt DateTime @default(now())
 }
 
-// بيت شعري مستقل: شرح وقصة وكلمات صعبة، بدل عرض القصيدة كنص واحد.
+// نسخة/رواية للقصيدة — قصيدة واحدة قد تُروى بأكثر من نسخة (رواية متداولة،
+// رواية ديوان محقق، رواية شفهية...)، ولكل نسخة أبياتها الخاصة.
+model PoemVersion {
+  id                String   @id @default(cuid())
+  poemId            String
+  label             String
+  isPrimary         Boolean  @default(false)
+  sourceNotes       String?
+  verificationLevel VerificationLevel @default(UNDER_REVIEW)
+  status            ContentStatus @default(DRAFT)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  createdBy         String?
+  reviewedBy        String?
+
+  poem   Poem        @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  verses PoemVerse[]
+
+  @@index([poemId])
+}
+
+// بيت شعري مستقل تابع لنسخة قصيدة محددة: شرح وقصة وكلمات صعبة، بدل عرض
+// القصيدة كنص واحد.
 model PoemVerse {
   id              String   @id @default(cuid())
-  poemId          String
+  versionId       String
   orderIndex      Int
   text            String
   explanation     String?
@@ -1254,7 +1278,41 @@ model PoemVerse {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  poem    Poem      @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  version  PoemVersion        @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  variants PoemVerseVariant[]
+
+  @@index([versionId])
+}
+
+// رواية مختلفة لنفس البيت (اختلاف نص بين مصدرين أو راويين لنفس البيت داخل
+// نفس نسخة القصيدة)، منفصلة عن نسخة القصيدة الكاملة (PoemVersion).
+model PoemVerseVariant {
+  id          String   @id @default(cuid())
+  verseId     String
+  text        String
+  sourceNotes String?
+  createdAt   DateTime @default(now())
+  createdBy   String?
+
+  verse PoemVerse @relation(fields: [verseId], references: [id], onDelete: Cascade)
+
+  @@index([verseId])
+}
+
+// حالة نسبة القصيدة لشاعر — قد يوجد أكثر من مُرشَّح لنسبة القصيدة إليه مع
+// اختلاف الروايات حول ذلك.
+model PoemAttribution {
+  id          String   @id @default(cuid())
+  poemId      String
+  poetId      String?
+  claimedName String?
+  consensus   ConsensusStatus @default(AGREED)
+  notes       String?
+  createdAt   DateTime @default(now())
+  createdBy   String?
+
+  poem Poem  @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  poet Poet? @relation(fields: [poetId], references: [id])
 
   @@index([poemId])
 }

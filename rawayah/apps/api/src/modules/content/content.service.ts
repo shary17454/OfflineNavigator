@@ -3,7 +3,17 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { normalizeArabic } from '../../shared/common/arabic-normalize';
 import { ModerationService } from '../moderation/moderation.service';
-import { CreateCommentDto, CreatePoemDto, CreateQuestionDto, FavoriteDto, SearchDto } from './dto/content.dto';
+import {
+  CreateCommentDto,
+  CreatePoemAttributionDto,
+  CreatePoemDto,
+  CreatePoemVerseDto,
+  CreatePoemVerseVariantDto,
+  CreatePoemVersionDto,
+  CreateQuestionDto,
+  FavoriteDto,
+  SearchDto,
+} from './dto/content.dto';
 
 @Injectable()
 export class ContentService {
@@ -48,7 +58,19 @@ export class ContentService {
     const poem = await this.prisma.poem.update({
       where: { id },
       data: { viewCount: { increment: 1 } },
-      include: { poet: true },
+      include: {
+        poet: true,
+        versions: {
+          orderBy: [{ isPrimary: 'desc' }, { createdAt: 'asc' }],
+          include: {
+            verses: {
+              orderBy: { orderIndex: 'asc' },
+              include: { variants: true },
+            },
+          },
+        },
+        attributions: { include: { poet: { select: { id: true, fullName: true } } } },
+      },
     }).catch(() => {
       throw new BadRequestException('القصيدة غير موجودة');
     });
@@ -60,6 +82,80 @@ export class ContentService {
     });
 
     return { ...poem, comments };
+  }
+
+  async createPoemVersion(poemId: string, dto: CreatePoemVersionDto, userId?: string) {
+    const poem = await this.prisma.poem.findUnique({ where: { id: poemId } });
+    if (!poem) throw new BadRequestException('القصيدة غير موجودة');
+
+    const existingCount = await this.prisma.poemVersion.count({ where: { poemId } });
+
+    return this.prisma.poemVersion.create({
+      data: {
+        poemId,
+        label: dto.label,
+        sourceNotes: dto.sourceNotes,
+        isPrimary: existingCount === 0,
+        createdBy: userId,
+      },
+    });
+  }
+
+  listPoemVersions(poemId: string) {
+    return this.prisma.poemVersion.findMany({
+      where: { poemId },
+      orderBy: [{ isPrimary: 'desc' }, { createdAt: 'asc' }],
+      include: { verses: { orderBy: { orderIndex: 'asc' } } },
+    });
+  }
+
+  async createPoemVerse(versionId: string, dto: CreatePoemVerseDto, userId?: string) {
+    const version = await this.prisma.poemVersion.findUnique({ where: { id: versionId } });
+    if (!version) throw new BadRequestException('نسخة القصيدة غير موجودة');
+
+    return this.prisma.poemVerse.create({
+      data: {
+        versionId,
+        text: dto.text,
+        orderIndex: dto.orderIndex,
+        explanation: dto.explanation,
+        occasion: dto.occasion,
+        difficultyWords: dto.difficultyWords as Prisma.InputJsonValue,
+      },
+    });
+  }
+
+  async createPoemVerseVariant(verseId: string, dto: CreatePoemVerseVariantDto, userId?: string) {
+    const verse = await this.prisma.poemVerse.findUnique({ where: { id: verseId } });
+    if (!verse) throw new BadRequestException('البيت غير موجود');
+
+    return this.prisma.poemVerseVariant.create({
+      data: {
+        verseId,
+        text: dto.text,
+        sourceNotes: dto.sourceNotes,
+        createdBy: userId,
+      },
+    });
+  }
+
+  async createPoemAttribution(poemId: string, dto: CreatePoemAttributionDto, userId?: string) {
+    const poem = await this.prisma.poem.findUnique({ where: { id: poemId } });
+    if (!poem) throw new BadRequestException('القصيدة غير موجودة');
+    if (!dto.poetId && !dto.claimedName) {
+      throw new BadRequestException('يجب تحديد شاعر مسجل أو اسم مُدَّعى على الأقل');
+    }
+
+    return this.prisma.poemAttribution.create({
+      data: {
+        poemId,
+        poetId: dto.poetId,
+        claimedName: dto.claimedName,
+        consensus: dto.consensus ?? 'AGREED',
+        notes: dto.notes,
+        createdBy: userId,
+      },
+    });
   }
 
   listStories(q?: string) {
@@ -201,7 +297,12 @@ export class ContentService {
     });
   }
 
-  answerQuestion(questionId: string, userId: string, body: string, isOfficial = false) {
+  // isOfficial لا يُقرأ أبدًا من مدخلات المستخدم — يُحسب هنا من صلاحياته
+  // الفعلية في قاعدة البيانات فقط، وإلا لاستطاع أي مستخدم انتحال صفة إجابة
+  // رسمية من المالك بمجرد إرسال isOfficial:true في الطلب.
+  async answerQuestion(questionId: string, userId: string, body: string) {
+    const isOfficial = await this.userHasPermission(userId, 'questions:answer_official');
+
     return this.prisma.answer.create({
       data: {
         questionId,
@@ -211,6 +312,16 @@ export class ContentService {
         isPreferred: isOfficial,
       },
     });
+  }
+
+  private async userHasPermission(userId: string, code: string): Promise<boolean> {
+    const count = await this.prisma.rolePermission.count({
+      where: {
+        permission: { code },
+        role: { userRoles: { some: { userId } } },
+      },
+    });
+    return count > 0;
   }
 
   reportContent(userId: string, body: { contentType: string; contentId: string; reason: string; details?: string }) {
