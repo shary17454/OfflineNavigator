@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { get } from '../lib/http';
 
 type HomePayload = {
@@ -25,16 +26,16 @@ export default function Home() {
         </ul>
       </section>
       <section>
-        <a href="/search">ابدأ البحث</a>
-        <a href="/reading-lists">قوائم القراءة</a>
-        <a href="/payments">الاشتراكات</a>
-        <a href="/poems">قصائد</a>
-        <a href="/poets">شعراء</a>
-        <a href="/stories">قصص</a>
-        <a href="/books">كتب</a>
-        <a href="/media/audio-player">مشغل الصوت</a>
-        <a href="/video-player">مشغل الفيديو</a>
-        <a href="/questions">الأسئلة</a>
+        <Link href="/search">ابدأ البحث</Link>
+        <Link href="/reading-lists">قوائم القراءة</Link>
+        <Link href="/payments">الاشتراكات</Link>
+        <Link href="/poems">قصائد</Link>
+        <Link href="/poets">شعراء</Link>
+        <Link href="/stories">قصص</Link>
+        <Link href="/books">كتب</Link>
+        <Link href="/media/audio-player">مشغل الصوت</Link>
+        <Link href="/video-player">مشغل الفيديو</Link>
+        <Link href="/questions">الأسئلة</Link>
       </section>
     </main>
   );

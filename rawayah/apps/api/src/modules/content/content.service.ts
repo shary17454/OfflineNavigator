@@ -109,7 +109,10 @@ export class ContentService {
     });
   }
 
-  async createPoemVerse(versionId: string, dto: CreatePoemVerseDto, userId?: string) {
+  // البيت لا يحمل حقل createdBy مستقلاً — إسناده يُستمد من نسخة القصيدة
+  // (PoemVersion.createdBy) التي ينتمي إليها؛ المعرِّف الثالث محفوظ في توقيع
+  // الدالة للاتساق مع بقية دوال هذا النموذج فقط.
+  async createPoemVerse(versionId: string, dto: CreatePoemVerseDto, _userId?: string) {
     const version = await this.prisma.poemVersion.findUnique({ where: { id: versionId } });
     if (!version) throw new BadRequestException('نسخة القصيدة غير موجودة');
 
