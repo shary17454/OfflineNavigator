@@ -1,8 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { verify as verifyOtp } from 'otplib';
+import * as crypto from 'crypto';
 import { PrismaService } from '../../shared/prisma/prisma.service';
-import { ChangePasswordDto, LoginDto, RefreshDto, RegisterDto, Verify2FADto } from './dto/auth.dto';
+import { ChangePasswordDto, DeleteAccountDto, LoginDto, RefreshDto, RegisterDto, Verify2FADto } from './dto/auth.dto';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -90,6 +91,93 @@ export class AuthService {
       where: { id: userId },
       data: { passwordHash: await argon2.hash(dto.newPassword), mustChangePassword: false },
     });
+    return { success: true };
+  }
+
+  // تصدير بيانات المستخدم الخاصة به (قسم 20: طلبات الخصوصية / تصدير البيانات).
+  async exportAccountData(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { profile: true },
+    });
+    if (!user) throw new UnauthorizedException('المستخدم غير موجود');
+
+    const [favorites, follows, readingLists, ratings, comments, questions, answers, contentReports] = await Promise.all([
+      this.prisma.favorite.findMany({ where: { userId } }),
+      this.prisma.follow.findMany({ where: { followerId: userId } }),
+      this.prisma.readingList.findMany({ where: { userId }, include: { items: true } }),
+      this.prisma.rating.findMany({ where: { userId } }),
+      this.prisma.comment.findMany({ where: { userId } }),
+      this.prisma.question.findMany({ where: { createdBy: userId } }),
+      this.prisma.answer.findMany({ where: { userId } }),
+      this.prisma.contentReport.findMany({ where: { reporterId: userId } }),
+    ]);
+
+    return {
+      account: {
+        id: user.id,
+        email: user.email,
+        status: user.status,
+        createdAt: user.createdAt,
+        lastLoginAt: user.lastLoginAt,
+      },
+      profile: user.profile,
+      favorites,
+      follows,
+      readingLists,
+      ratings,
+      comments,
+      questions,
+      answers,
+      contentReports,
+    };
+  }
+
+  // حذف الحساب (قسم 20): لا يكفي Soft Delete وحده — يُحذف كل ما هو تفضيل/سلوك
+  // شخصي بحت فعليًا، ويُخفى الاسم/الملف الشخصي، ويُنزع البريد وكلمة المرور
+  // الفعليان عن صف المستخدم. لا يُحذف صف المستخدم نفسه ولا محتواه العام
+  // المساهَم به (أسئلة/إجابات/تعليقات) لأن FK عليها Cascade من جهة User —
+  // حذف الصف سيحذف تلقائيًا أسئلة قد يكون عليها إجابات من مستخدمين آخرين.
+  async deleteAccount(userId: string, dto: DeleteAccountDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { userRoles: { include: { role: true } } },
+    });
+    if (!user) throw new UnauthorizedException('المستخدم غير موجود');
+
+    const valid = await argon2.verify(user.passwordHash, dto.password);
+    if (!valid) throw new UnauthorizedException('كلمة المرور غير صحيحة');
+
+    const isOwner = user.userRoles.some((ur) => ur.role.code === 'OWNER');
+    if (isOwner) {
+      throw new UnauthorizedException('لا يمكن لحساب OWNER حذف نفسه عبر هذا المسار — يتطلب إجراء إداريًا منفصلاً');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.refreshToken.deleteMany({ where: { userId } }),
+      this.prisma.favorite.deleteMany({ where: { userId } }),
+      this.prisma.follow.deleteMany({ where: { followerId: userId } }),
+      this.prisma.notification.deleteMany({ where: { userId } }),
+      this.prisma.readingList.deleteMany({ where: { userId } }),
+      this.prisma.rating.deleteMany({ where: { userId } }),
+      this.prisma.contentReport.deleteMany({ where: { reporterId: userId } }),
+      this.prisma.commentReport.deleteMany({ where: { reporterId: userId } }),
+      this.prisma.profile.deleteMany({ where: { userId } }),
+      this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          email: `deleted-${userId}@deleted.rawaya.local`,
+          passwordHash: crypto.randomBytes(32).toString('hex'),
+          status: 'DELETED',
+          isEmailVerified: false,
+          mustChangePassword: false,
+          twoFactorSecret: null,
+          twoFactorEnabled: false,
+          deletedAt: new Date(),
+        },
+      }),
+    ]);
+
     return { success: true };
   }
 

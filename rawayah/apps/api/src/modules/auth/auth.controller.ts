@@ -1,9 +1,9 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../shared/common/current-user.decorator';
 import { JwtAuthGuard } from '../../shared/common/jwt-auth.guard';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto, LoginDto, RefreshDto, RegisterDto, Verify2FADto } from './dto/auth.dto';
+import { ChangePasswordDto, DeleteAccountDto, LoginDto, RefreshDto, RegisterDto, Verify2FADto } from './dto/auth.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -44,5 +44,19 @@ export class AuthController {
   @Post('change-password')
   changePassword(@CurrentUser() user: any, @Body() dto: ChangePasswordDto) {
     return this.svc.changePassword(user.id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('account/export')
+  exportAccount(@CurrentUser() user: any) {
+    return this.svc.exportAccountData(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post('account/delete')
+  deleteAccount(@CurrentUser() user: any, @Body() dto: DeleteAccountDto) {
+    return this.svc.deleteAccount(user.id, dto);
   }
 }

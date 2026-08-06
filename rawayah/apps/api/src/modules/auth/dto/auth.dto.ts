@@ -56,3 +56,10 @@ export class ChangePasswordDto {
   @MinLength(8)
   newPassword!: string;
 }
+
+export class DeleteAccountDto {
+  @ApiProperty({ description: 'تأكيد كلمة المرور الحالية — إلزامي لأي عملية حذف حساب' })
+  @IsString()
+  @MinLength(8)
+  password!: string;
+}
