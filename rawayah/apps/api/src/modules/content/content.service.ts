@@ -218,6 +218,50 @@ export class ContentService {
     });
   }
 
+  async getHorse(id: string) {
+    const horse = await this.prisma.horse.findFirst({ where: { id, status: 'PUBLISHED' } });
+    if (!horse) throw new BadRequestException('الحصان غير موجود');
+    return horse;
+  }
+
+  listCamels(q?: string) {
+    return this.prisma.camel.findMany({
+      where: { ...(q ? { name: { contains: q, mode: 'insensitive' } } : {}), status: 'PUBLISHED' },
+      take: 50,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getCamel(id: string) {
+    const camel = await this.prisma.camel.findFirst({ where: { id, status: 'PUBLISHED' } });
+    if (!camel) throw new BadRequestException('الجمل غير موجود');
+    return camel;
+  }
+
+  listFalcons(q?: string) {
+    return this.prisma.falcon.findMany({
+      where: { ...(q ? { name: { contains: q, mode: 'insensitive' } } : {}), status: 'PUBLISHED' },
+      take: 50,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getFalcon(id: string) {
+    const falcon = await this.prisma.falcon.findFirst({ where: { id, status: 'PUBLISHED' } });
+    if (!falcon) throw new BadRequestException('الصقر غير موجود');
+    return falcon;
+  }
+
+  listHuntingDogBreeds() {
+    return this.prisma.huntingDogBreed.findMany({ orderBy: { name: 'asc' } });
+  }
+
+  async getHuntingDogBreed(id: string) {
+    const breed = await this.prisma.huntingDogBreed.findUnique({ where: { id } });
+    if (!breed) throw new BadRequestException('السلالة غير موجودة');
+    return breed;
+  }
+
   listProverbs(q?: string) {
     return this.prisma.proverb.findMany({
       where: { ...(q ? { phrase: { contains: q, mode: 'insensitive' } } : {}), status: 'PUBLISHED', deletedAt: null },

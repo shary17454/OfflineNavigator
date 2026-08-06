@@ -32,6 +32,16 @@ import 'features/account/account_page.dart';
 import 'features/account/settings_page.dart';
 import 'features/notifications/notifications_page.dart';
 import 'features/static/static_pages.dart';
+import 'features/horses/horses_page.dart';
+import 'features/horses/horse_detail_page.dart';
+import 'features/camels/camels_page.dart';
+import 'features/camels/camel_detail_page.dart';
+import 'features/hunting/hunting_page.dart';
+import 'features/hunting/hunting_detail_page.dart';
+import 'features/hunting/hunting_dogs_page.dart';
+import 'features/hunting/hunting_dog_detail_page.dart';
+import 'features/reading_lists/reading_lists_page.dart';
+import 'features/media/media_page.dart';
 import 'screens/placeholder_page.dart';
 
 void main() {
@@ -40,42 +50,25 @@ void main() {
 
 class RawayaRoutes {
   // مسارات لم تُبنَ شاشاتها الحقيقية بعد — إما خارج نطاق MVP صراحة
-  // (الاشتراكات المدفوعة) أو تحتاج عملاً إضافيًا (مشغلات الوسائط، قوائم
-  // القراءة، الخيل/الإبل/الصقارة بلا نقاط API تفصيلية بعد). تُعرض كصفحة
-  // "قريبًا" صادقة بدل بيانات مختلقة.
+  // (الاشتراكات المدفوعة، مستبعدة عمدًا حسب الطلب الأصلي) أو مشغلات وسائط
+  // مستقلة بلا سياق (لا يوجد رابط فعلي لأي مقطع محدد بعد — قائمة الوسائط
+  // نفسها حقيقية ومربوطة). البلاغات كميزة مستقلة غير مطلوبة لأن الإبلاغ
+  // يعمل فعليًا من الورقة السفلية العامة على صفحات المحتوى.
   static const placeholders = [
-    '/reading-lists',
-    '/horses',
-    '/camels',
-    '/hunting',
-    '/hunting-dogs',
     '/subscriptions',
     '/audio-player',
     '/video-player',
-    '/media',
     '/reports',
   ];
 
   static String title(String route) {
     switch (route) {
-      case '/reading-lists':
-        return 'المكتبة';
-      case '/horses':
-        return 'الخيل';
-      case '/camels':
-        return 'الإبل';
-      case '/hunting':
-        return 'الصقارة والقنص';
-      case '/hunting-dogs':
-        return 'كلاب الصيد';
       case '/subscriptions':
         return 'الاشتراكات';
       case '/audio-player':
         return 'مشغل الصوت';
       case '/video-player':
         return 'مشغل الفيديو';
-      case '/media':
-        return 'الوسائط';
       case '/reports':
         return 'البلاغات';
       default:
@@ -158,6 +151,32 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: ':id', builder: (context, state) => QuestionDetailPage(questionId: state.pathParameters['id']!)),
         ],
       ),
+      GoRoute(
+        path: '/horses',
+        name: 'horses',
+        builder: (context, state) => const HorsesPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => HorseDetailPage(horseId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/camels',
+        name: 'camels',
+        builder: (context, state) => const CamelsPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => CamelDetailPage(camelId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/hunting',
+        name: 'hunting',
+        builder: (context, state) => const HuntingPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => HuntingDetailPage(itemId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/hunting-dogs',
+        name: 'hunting-dogs',
+        builder: (context, state) => const HuntingDogsPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => HuntingDogDetailPage(breedId: state.pathParameters['id']!))],
+      ),
+      GoRoute(path: '/reading-lists', name: 'reading-lists', builder: (context, state) => const ReadingListsPage()),
+      GoRoute(path: '/media', name: 'media', builder: (context, state) => const MediaPage()),
 
       GoRoute(
         path: '/offline',

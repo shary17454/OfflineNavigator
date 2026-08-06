@@ -75,6 +75,41 @@ export class ContentController {
     return this.svc.listHorses(q);
   }
 
+  @Get('horses/:id')
+  horse(@Param('id') id: string) {
+    return this.svc.getHorse(id);
+  }
+
+  @Get('camels')
+  camels(@Query('q') q?: string) {
+    return this.svc.listCamels(q);
+  }
+
+  @Get('camels/:id')
+  camel(@Param('id') id: string) {
+    return this.svc.getCamel(id);
+  }
+
+  @Get('hunting')
+  hunting(@Query('q') q?: string) {
+    return this.svc.listFalcons(q);
+  }
+
+  @Get('hunting/:id')
+  huntingItem(@Param('id') id: string) {
+    return this.svc.getFalcon(id);
+  }
+
+  @Get('hunting-dogs')
+  huntingDogs() {
+    return this.svc.listHuntingDogBreeds();
+  }
+
+  @Get('hunting-dogs/:id')
+  huntingDog(@Param('id') id: string) {
+    return this.svc.getHuntingDogBreed(id);
+  }
+
   @Get('proverbs')
   proverbs(@Query('q') q?: string) {
     return this.svc.listProverbs(q);
