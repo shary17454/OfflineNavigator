@@ -1,10 +1,11 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/prisma/prisma.service';
+import { ModerationService } from '../moderation/moderation.service';
 import { CreateCommentDto, CreatePoemDto, CreateQuestionDto, FavoriteDto, SearchDto } from './dto/content.dto';
 
 @Injectable()
 export class ContentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private moderation: ModerationService) {}
 
   getHomePage() {
     return {
@@ -107,72 +108,19 @@ export class ContentService {
     });
   }
 
+  // القصيدة نوع محتوى ضمن ModerationService العامة — هذه دوال توافقية رفيعة
+  // تُبقي مسارات /poems/:id/submit|review|publish القديمة تعمل دون تغيير سلوكها من طرف لوحة الإدارة.
   submitPoem(id: string) {
-    return this.prisma.poem.update({ where: { id }, data: { status: 'SUBMITTED' } });
+    return this.moderation.submit('POEM', id);
   }
 
   async moderatePoem(id: string, action: 'approve' | 'request_revision' | 'reject', reviewerId: string, note?: string) {
-    const existing = await this.prisma.poem.findUnique({ where: { id } });
-    if (!existing) throw new BadRequestException('القصيدة غير موجودة');
-
-    const status = action === 'approve' ? 'VERIFIED' : action === 'request_revision' ? 'NEEDS_REVISION' : 'REJECTED';
-    const revision = await this.prisma.contentRevision.create({
-      data: {
-        contentType: 'POEM',
-        contentId: id,
-        reviewNotes: note,
-        reviewedBy: reviewerId,
-      },
-    });
-
-    const poem = await this.prisma.poem.update({
-      where: { id },
-      data: {
-        status,
-        reviewedBy: reviewerId,
-      },
-    });
-
-    await this.prisma.moderationLog.create({
-      data: {
-        actorId: reviewerId,
-        action: `poem.${action}`,
-        entityType: 'POEM',
-        entityId: id,
-        notes: note || null,
-      },
-    });
-
-    return { poem, revisionId: revision.id, action };
+    const { record, revisionId } = await this.moderation.review('POEM', id, reviewerId, action, note);
+    return { poem: record, revisionId, action };
   }
 
-  async publishPoem(id: string, editorId: string, note?: string) {
-    const existing = await this.prisma.poem.findUnique({ where: { id } });
-    if (!existing) throw new BadRequestException('القصيدة غير موجودة');
-    if (existing.status !== 'VERIFIED' && existing.status !== 'SUBMITTED') {
-      throw new ForbiddenException('المحتوى غير جاهز للنشر');
-    }
-
-    const poem = await this.prisma.poem.update({
-      where: { id },
-      data: {
-        status: 'PUBLISHED',
-        publishedBy: editorId,
-        publishedAt: new Date(),
-      },
-    });
-
-    await this.prisma.moderationLog.create({
-      data: {
-        actorId: editorId,
-        action: 'poem.publish',
-        entityType: 'POEM',
-        entityId: id,
-        notes: note || null,
-      },
-    });
-
-    return poem;
+  publishPoem(id: string, editorId: string, note?: string) {
+    return this.moderation.publish('POEM', id, editorId, note);
   }
 
   listPendingPoems() {

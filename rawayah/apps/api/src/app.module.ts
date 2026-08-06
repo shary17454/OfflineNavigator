@@ -16,6 +16,8 @@ import { ReadingListsModule } from './modules/reading-lists/reading-lists.module
 import { PaymentsModule } from './modules/payments/payments.module';
 import { GraphModule } from './modules/graph/graph.module';
 import { SuggestionsModule } from './modules/suggestions/suggestions.module';
+import { ModerationModule } from './modules/moderation/moderation.module';
+import { IngestionModule } from './modules/ingestion/ingestion.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { SuggestionsModule } from './modules/suggestions/suggestions.module';
     PaymentsModule,
     GraphModule,
     SuggestionsModule,
+    ModerationModule,
+    IngestionModule,
   ],
   providers: [
     {
