@@ -41,6 +41,17 @@ export class ContentService {
     });
   }
 
+  async getPoet(id: string) {
+    const poet = await this.prisma.poet.findFirst({
+      where: { id, status: 'PUBLISHED' },
+      include: {
+        poems: { where: { status: 'PUBLISHED', deletedAt: null }, orderBy: { createdAt: 'desc' }, take: 20 },
+      },
+    });
+    if (!poet) throw new BadRequestException('الشاعر غير موجود');
+    return poet;
+  }
+
   listPoems(q?: string) {
     return this.prisma.poem.findMany({
       where: {
@@ -173,6 +184,12 @@ export class ContentService {
     });
   }
 
+  async getStory(id: string) {
+    const story = await this.prisma.story.findFirst({ where: { id, status: 'PUBLISHED', deletedAt: null } });
+    if (!story) throw new BadRequestException('القصة غير موجودة');
+    return story;
+  }
+
   listBooks(q?: string) {
     return this.prisma.book.findMany({
       where: {
@@ -184,6 +201,12 @@ export class ContentService {
     });
   }
 
+  async getBook(id: string) {
+    const book = await this.prisma.book.findFirst({ where: { id, status: 'PUBLISHED' } });
+    if (!book) throw new BadRequestException('الكتاب غير موجود');
+    return book;
+  }
+
   listHorses(q?: string) {
     return this.prisma.horse.findMany({
       where: {
@@ -193,6 +216,69 @@ export class ContentService {
       take: 50,
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  listProverbs(q?: string) {
+    return this.prisma.proverb.findMany({
+      where: { ...(q ? { phrase: { contains: q, mode: 'insensitive' } } : {}), status: 'PUBLISHED', deletedAt: null },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  async getProverb(id: string) {
+    const proverb = await this.prisma.proverb.findFirst({ where: { id, status: 'PUBLISHED', deletedAt: null } });
+    if (!proverb) throw new BadRequestException('المثل غير موجود');
+    return proverb;
+  }
+
+  listVocabulary(q?: string) {
+    return this.prisma.vocabularyTerm.findMany({
+      where: { ...(q ? { term: { contains: q, mode: 'insensitive' } } : {}), status: 'PUBLISHED', deletedAt: null },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  async getVocabularyTerm(id: string) {
+    const term = await this.prisma.vocabularyTerm.findFirst({ where: { id, status: 'PUBLISHED', deletedAt: null } });
+    if (!term) throw new BadRequestException('المفردة غير موجودة');
+    return term;
+  }
+
+  listPlaces(q?: string) {
+    return this.prisma.place.findMany({
+      where: {
+        ...(q ? { name: { contains: q, mode: 'insensitive' } } : {}),
+        status: 'PUBLISHED',
+        deletedAt: null,
+        isSensitive: false,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  async getPlace(id: string) {
+    const place = await this.prisma.place.findFirst({
+      where: { id, status: 'PUBLISHED', deletedAt: null, isSensitive: false },
+    });
+    if (!place) throw new BadRequestException('المكان غير موجود');
+    return place;
+  }
+
+  listTopics(q?: string) {
+    return this.prisma.topic.findMany({
+      where: { ...(q ? { title: { contains: q, mode: 'insensitive' } } : {}), status: 'PUBLISHED' },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  async getTopic(id: string) {
+    const topic = await this.prisma.topic.findFirst({ where: { id, status: 'PUBLISHED' } });
+    if (!topic) throw new BadRequestException('الموضوع غير موجود');
+    return topic;
   }
 
   createPoem(dto: CreatePoemDto, createdBy?: string) {
@@ -257,6 +343,31 @@ export class ContentService {
     });
   }
 
+  // يحل عنوان العنصر المفضَّل من نموذجه الفعلي — Favorite تُخزَّن بنمط
+  // متعدد الأشكال (contentType+contentId) بلا FK حقيقي، فلا يوجد include
+  // تلقائي ممكن من Prisma لهذا النمط.
+  private async resolveTitle(contentType: string, contentId: string): Promise<string | null> {
+    switch (contentType) {
+      case 'POEM':
+        return (await this.prisma.poem.findUnique({ where: { id: contentId }, select: { title: true } }))?.title ?? null;
+      case 'STORY':
+        return (await this.prisma.story.findUnique({ where: { id: contentId }, select: { title: true } }))?.title ?? null;
+      case 'BOOK':
+        return (await this.prisma.book.findUnique({ where: { id: contentId }, select: { title: true } }))?.title ?? null;
+      case 'POET':
+        return (await this.prisma.poet.findUnique({ where: { id: contentId }, select: { fullName: true } }))?.fullName ?? null;
+      default:
+        return null;
+    }
+  }
+
+  async listFavorites(userId: string) {
+    const favorites = await this.prisma.favorite.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } });
+    return Promise.all(
+      favorites.map(async (fav) => ({ ...fav, title: await this.resolveTitle(fav.contentType, fav.contentId) })),
+    );
+  }
+
   async addFavorite(userId: string, dto: FavoriteDto) {
     const existed = await this.prisma.favorite.findFirst({
       where: { userId, contentType: dto.contentType as any, contentId: dto.contentId },
@@ -269,6 +380,16 @@ export class ContentService {
     return this.prisma.favorite.create({
       data: { userId, contentType: dto.contentType as any, contentId: dto.contentId },
     });
+  }
+
+  listNotifications(userId: string) {
+    return this.prisma.notification.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, take: 50 });
+  }
+
+  async markNotificationRead(userId: string, id: string) {
+    const notification = await this.prisma.notification.findFirst({ where: { id, userId } });
+    if (!notification) throw new BadRequestException('الإشعار غير موجود');
+    return this.prisma.notification.update({ where: { id }, data: { isRead: true } });
   }
 
   createQuestion(userId: string, dto: CreateQuestionDto) {

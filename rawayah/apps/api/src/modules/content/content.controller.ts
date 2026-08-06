@@ -35,6 +35,11 @@ export class ContentController {
     return this.svc.listPoets(q);
   }
 
+  @Get('poets/:id')
+  poet(@Param('id') id: string) {
+    return this.svc.getPoet(id);
+  }
+
   @Get('poems')
   poems(@Query('q') q?: string) {
     return this.svc.listPoems(q);
@@ -50,14 +55,64 @@ export class ContentController {
     return this.svc.listStories(q);
   }
 
+  @Get('stories/:id')
+  story(@Param('id') id: string) {
+    return this.svc.getStory(id);
+  }
+
   @Get('books')
   books(@Query('q') q?: string) {
     return this.svc.listBooks(q);
   }
 
+  @Get('books/:id')
+  book(@Param('id') id: string) {
+    return this.svc.getBook(id);
+  }
+
   @Get('horses')
   horses(@Query('q') q?: string) {
     return this.svc.listHorses(q);
+  }
+
+  @Get('proverbs')
+  proverbs(@Query('q') q?: string) {
+    return this.svc.listProverbs(q);
+  }
+
+  @Get('proverbs/:id')
+  proverb(@Param('id') id: string) {
+    return this.svc.getProverb(id);
+  }
+
+  @Get('vocabulary')
+  vocabulary(@Query('q') q?: string) {
+    return this.svc.listVocabulary(q);
+  }
+
+  @Get('vocabulary/:id')
+  vocabularyTerm(@Param('id') id: string) {
+    return this.svc.getVocabularyTerm(id);
+  }
+
+  @Get('places')
+  places(@Query('q') q?: string) {
+    return this.svc.listPlaces(q);
+  }
+
+  @Get('places/:id')
+  place(@Param('id') id: string) {
+    return this.svc.getPlace(id);
+  }
+
+  @Get('topics')
+  topics(@Query('q') q?: string) {
+    return this.svc.listTopics(q);
+  }
+
+  @Get('topics/:id')
+  topic(@Param('id') id: string) {
+    return this.svc.getTopic(id);
   }
 
   @Get('search')
@@ -172,9 +227,30 @@ export class ContentController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Get('favorites')
+  favorites(@CurrentUser() user: any) {
+    return this.svc.listFavorites(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('favorites')
   favorite(@CurrentUser() user: any, @Body() dto: FavoriteDto) {
     return this.svc.addFavorite(user.id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('notifications')
+  notifications(@CurrentUser() user: any) {
+    return this.svc.listNotifications(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post('notifications/:id/read')
+  markNotificationRead(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.svc.markNotificationRead(user.id, id);
   }
 
   @UseGuards(JwtAuthGuard)

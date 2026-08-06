@@ -5,8 +5,33 @@ import 'package:go_router/go_router.dart';
 
 import 'features/home/home_page.dart';
 import 'features/search/search_page.dart';
-import 'features/auth/auth_page.dart';
+import 'features/auth/login_page.dart';
+import 'features/auth/register_page.dart';
 import 'features/offline/offline_library_page.dart';
+import 'features/poets/poets_page.dart';
+import 'features/poets/poet_detail_page.dart';
+import 'features/poems/poems_page.dart';
+import 'features/poems/poem_detail_page.dart';
+import 'features/stories/stories_page.dart';
+import 'features/stories/story_detail_page.dart';
+import 'features/books/books_page.dart';
+import 'features/books/book_detail_page.dart';
+import 'features/proverbs/proverbs_page.dart';
+import 'features/proverbs/proverb_detail_page.dart';
+import 'features/vocabulary/vocabulary_page.dart';
+import 'features/vocabulary/vocabulary_detail_page.dart';
+import 'features/places/places_page.dart';
+import 'features/places/place_detail_page.dart';
+import 'features/topics/topics_page.dart';
+import 'features/topics/topic_detail_page.dart';
+import 'features/favorites/favorites_page.dart';
+import 'features/questions/questions_page.dart';
+import 'features/questions/question_detail_page.dart';
+import 'features/questions/create_question_page.dart';
+import 'features/account/account_page.dart';
+import 'features/account/settings_page.dart';
+import 'features/notifications/notifications_page.dart';
+import 'features/static/static_pages.dart';
 import 'screens/placeholder_page.dart';
 
 void main() {
@@ -14,65 +39,27 @@ void main() {
 }
 
 class RawayaRoutes {
-  static const list = [
-    '/home',
-    '/search',
-    '/auth',
-    '/poetry',
-    '/poems',
-    '/stories',
-    '/books',
-    '/places',
+  // مسارات لم تُبنَ شاشاتها الحقيقية بعد — إما خارج نطاق MVP صراحة
+  // (الاشتراكات المدفوعة) أو تحتاج عملاً إضافيًا (مشغلات الوسائط، قوائم
+  // القراءة، الخيل/الإبل/الصقارة بلا نقاط API تفصيلية بعد). تُعرض كصفحة
+  // "قريبًا" صادقة بدل بيانات مختلقة.
+  static const placeholders = [
+    '/reading-lists',
     '/horses',
     '/camels',
     '/hunting',
     '/hunting-dogs',
-    '/favorites',
-    '/reading-lists',
-    '/questions',
-    '/notifications',
-    '/profile',
-    '/settings',
     '/subscriptions',
-    '/privacy',
-    '/terms',
-    '/about',
-    '/contact',
-    '/offline',
     '/audio-player',
     '/video-player',
     '/media',
     '/reports',
-    '/search-results',
-    '/admin',
   ];
 
   static String title(String route) {
     switch (route) {
-      case '/home':
-        return 'الرئيسية';
-      case '/search':
-        return 'البحث';
-      case '/auth':
-        return 'التسجيل';
-      case '/poetry':
-        return 'الشعر';
-      case '/favorites':
-        return 'المفضلة';
-      case '/offline':
-        return 'دفتر دون اتصال';
-      case '/profile':
-        return 'حسابي';
       case '/reading-lists':
         return 'المكتبة';
-      case '/poems':
-        return 'القصائد';
-      case '/stories':
-        return 'القصص';
-      case '/books':
-        return 'الكتب والمراجع';
-      case '/places':
-        return 'الأماكن والمعالم';
       case '/horses':
         return 'الخيل';
       case '/camels':
@@ -81,22 +68,16 @@ class RawayaRoutes {
         return 'الصقارة والقنص';
       case '/hunting-dogs':
         return 'كلاب الصيد';
-      case '/questions':
-        return 'الأسئلة';
-      case '/notifications':
-        return 'الإشعارات';
-      case '/settings':
-        return 'الإعدادات';
       case '/subscriptions':
         return 'الاشتراكات';
-      case '/privacy':
-        return 'الخصوصية';
-      case '/terms':
-        return 'الشروط';
-      case '/about':
-        return 'عن التطبيق';
-      case '/contact':
-        return 'تواصل معنا';
+      case '/audio-player':
+        return 'مشغل الصوت';
+      case '/video-player':
+        return 'مشغل الفيديو';
+      case '/media':
+        return 'الوسائط';
+      case '/reports':
+        return 'البلاغات';
       default:
         return route.replaceFirst('/', '');
     }
@@ -109,7 +90,75 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/', name: 'splash', builder: (context, state) => const SplashPage()),
       GoRoute(path: '/home', name: 'home', builder: (context, state) => const HomePage()),
       GoRoute(path: '/search', name: 'search', builder: (context, state) => const SearchPage()),
-      GoRoute(path: '/auth', name: 'auth', builder: (context, state) => const AuthPage()),
+      GoRoute(path: '/login', name: 'login', builder: (context, state) => const LoginPage()),
+      GoRoute(path: '/register', name: 'register', builder: (context, state) => const RegisterPage()),
+      GoRoute(path: '/profile', name: 'profile', builder: (context, state) => const AccountPage()),
+      GoRoute(path: '/settings', name: 'settings', builder: (context, state) => const SettingsPage()),
+      GoRoute(path: '/notifications', name: 'notifications', builder: (context, state) => const NotificationsPage()),
+      GoRoute(path: '/favorites', name: 'favorites', builder: (context, state) => const FavoritesPage()),
+      GoRoute(path: '/about', name: 'about', builder: (context, state) => const AboutPage()),
+      GoRoute(path: '/privacy', name: 'privacy', builder: (context, state) => const PrivacyPage()),
+      GoRoute(path: '/terms', name: 'terms', builder: (context, state) => const TermsPage()),
+      GoRoute(path: '/contact', name: 'contact', builder: (context, state) => const ContactPage()),
+
+      GoRoute(
+        path: '/poets',
+        name: 'poets',
+        builder: (context, state) => const PoetsPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => PoetDetailPage(poetId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/poems',
+        name: 'poems',
+        builder: (context, state) => const PoemsPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => PoemDetailPage(poemId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/stories',
+        name: 'stories',
+        builder: (context, state) => const StoriesPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => StoryDetailPage(storyId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/books',
+        name: 'books',
+        builder: (context, state) => const BooksPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => BookDetailPage(bookId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/proverbs',
+        name: 'proverbs',
+        builder: (context, state) => const ProverbsPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => ProverbDetailPage(proverbId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/vocabulary',
+        name: 'vocabulary',
+        builder: (context, state) => const VocabularyPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => VocabularyDetailPage(termId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/places',
+        name: 'places',
+        builder: (context, state) => const PlacesPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => PlaceDetailPage(placeId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/topics',
+        name: 'topics',
+        builder: (context, state) => const TopicsPage(),
+        routes: [GoRoute(path: ':id', builder: (context, state) => TopicDetailPage(topicId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/questions',
+        name: 'questions',
+        builder: (context, state) => const QuestionsPage(),
+        routes: [
+          GoRoute(path: 'new', builder: (context, state) => const CreateQuestionPage()),
+          GoRoute(path: ':id', builder: (context, state) => QuestionDetailPage(questionId: state.pathParameters['id']!)),
+        ],
+      ),
+
       GoRoute(
         path: '/offline',
         name: 'offline',
@@ -132,14 +181,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      ...RawayaRoutes.list
-          .where((path) => !['/home', '/search', '/auth', '/offline'].contains(path))
-          .map(
-            (path) => GoRoute(
-              path: path,
-              builder: (context, state) => PlaceholderPage(title: RawayaRoutes.title(path)),
-            ),
-          ),
+      ...RawayaRoutes.placeholders.map(
+        (path) => GoRoute(
+          path: path,
+          builder: (context, state) => PlaceholderPage(title: RawayaRoutes.title(path)),
+        ),
+      ),
     ],
     initialLocation: '/',
   );
@@ -152,7 +199,7 @@ class RawayaApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
-      title: 'رواية التراث',
+      title: 'موروث',
       routerConfig: router,
       theme: ThemeData(
         fontFamily: 'Tajawal',

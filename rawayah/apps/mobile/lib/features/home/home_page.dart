@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/api_client.dart';
+
 class HeritageCategory {
-  const HeritageCategory({required this.title, required this.image});
+  const HeritageCategory({required this.title, required this.image, required this.route});
 
   final String title;
   final String image;
-}
-
-class FeaturedPoet {
-  const FeaturedPoet({required this.name, required this.image});
-
-  final String name;
-  final String image;
+  final String route;
 }
 
 const _kBrown = Color(0xFF2A1F14);
@@ -20,17 +16,10 @@ const _kGold = Color(0xFFB68843);
 const _kCream = Color(0xFFFDF7ED);
 
 const _kCategories = [
-  HeritageCategory(title: 'الشعر', image: 'assets/images/cat_poetry.jpg'),
-  HeritageCategory(title: 'القصص', image: 'assets/images/cat_stories.jpg'),
-  HeritageCategory(title: 'الخيل', image: 'assets/images/cat_horses.jpg'),
-  HeritageCategory(title: 'الإبل', image: 'assets/images/cat_camels.jpg'),
-];
-
-const _kPoets = [
-  FeaturedPoet(name: 'عنترة بن شداد', image: 'assets/images/poet1.jpg'),
-  FeaturedPoet(name: 'طرفة بن العبد', image: 'assets/images/poet2.jpg'),
-  FeaturedPoet(name: 'امرؤ القيس', image: 'assets/images/poet3.jpg'),
-  FeaturedPoet(name: 'المتنبي', image: 'assets/images/poet4.jpg'),
+  HeritageCategory(title: 'الشعر', image: 'assets/images/cat_poetry.jpg', route: '/poems'),
+  HeritageCategory(title: 'القصص', image: 'assets/images/cat_stories.jpg', route: '/stories'),
+  HeritageCategory(title: 'الخيل', image: 'assets/images/cat_horses.jpg', route: '/horses'),
+  HeritageCategory(title: 'الإبل', image: 'assets/images/cat_camels.jpg', route: '/camels'),
 ];
 
 class HomePage extends StatefulWidget {
@@ -42,6 +31,34 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _navIndex = 4;
+  List<Map<String, dynamic>> _poets = const [];
+  Map<String, dynamic>? _latestPoem;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final results = await Future.wait([
+        ApiClient().get<List<dynamic>>('/poets'),
+        ApiClient().get<List<dynamic>>('/poems'),
+      ]);
+      final poets = (results[0].data ?? []).cast<Map<String, dynamic>>();
+      final poems = (results[1].data ?? []).cast<Map<String, dynamic>>();
+      setState(() {
+        _poets = poets.take(6).toList();
+        _latestPoem = poems.isNotEmpty ? poems.first : null;
+      });
+    } catch (_) {
+      // لا بيانات وهمية بديلة — الأقسام الفارغة تُعرض ببساطة كفارغة.
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   void _onNavTap(int index) {
     setState(() => _navIndex = index);
@@ -70,26 +87,28 @@ class _HomePageState extends State<HomePage> {
             children: [
               _buildHeader(context),
               Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                  children: [
-                    _buildSearchField(context),
-                    const SizedBox(height: 16),
-                    _buildHeroQuote(),
-                    const SizedBox(height: 20),
-                    _sectionTitle('اكتشف التراث'),
-                    const SizedBox(height: 10),
-                    _buildCategoriesRow(),
-                    const SizedBox(height: 20),
-                    _sectionTitle('أحدث القصائد', actionLabel: 'عرض الكل'),
-                    const SizedBox(height: 10),
-                    _buildLatestPoemCard(),
-                    const SizedBox(height: 20),
-                    _sectionTitle('شعراء بارزون', actionLabel: 'عرض الكل'),
-                    const SizedBox(height: 10),
-                    _buildPoetsRow(),
-                  ],
-                ),
+                child: _loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                        children: [
+                          _buildSearchField(context),
+                          const SizedBox(height: 16),
+                          _buildHeroQuote(),
+                          const SizedBox(height: 20),
+                          _sectionTitle('اكتشف التراث'),
+                          const SizedBox(height: 10),
+                          _buildCategoriesRow(context),
+                          const SizedBox(height: 20),
+                          _sectionTitle('أحدث القصائد', actionLabel: 'عرض الكل', onAction: () => context.push('/poems')),
+                          const SizedBox(height: 10),
+                          if (_latestPoem != null) _buildLatestPoemCard(context, _latestPoem!) else const Text('لا توجد قصائد منشورة بعد'),
+                          const SizedBox(height: 20),
+                          _sectionTitle('شعراء بارزون', actionLabel: 'عرض الكل', onAction: () => context.push('/poets')),
+                          const SizedBox(height: 10),
+                          if (_poets.isNotEmpty) _buildPoetsRow(context) else const Text('لا يوجد شعراء منشورون بعد'),
+                        ],
+                      ),
               ),
             ],
           ),
@@ -158,12 +177,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _sectionTitle(String title, {String? actionLabel}) {
+  Widget _sectionTitle(String title, {String? actionLabel, VoidCallback? onAction}) {
     return Row(
       children: [
         if (actionLabel != null)
           TextButton(
-            onPressed: () {},
+            onPressed: onAction,
             child: Text(actionLabel, style: const TextStyle(color: _kGold)),
           ),
         const Spacer(),
@@ -175,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCategoriesRow() {
+  Widget _buildCategoriesRow(BuildContext context) {
     return SizedBox(
       height: 108,
       child: ListView.separated(
@@ -188,7 +207,7 @@ class _HomePageState extends State<HomePage> {
           return SizedBox(
             width: 84,
             child: GestureDetector(
-              onTap: () => context.go('/search'),
+              onTap: () => context.push(category.route),
               child: Column(
                 children: [
                   ClipRRect(
@@ -214,83 +233,58 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildLatestPoemCard() {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                'assets/images/poem_thumb.jpg',
-                width: 64,
-                height: 64,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'يا طارق الوادي',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'للشاعر: فهد بن سعد',
-                    style: TextStyle(fontSize: 13, color: Colors.black54),
-                  ),
-                  SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(Icons.remove_red_eye_outlined, size: 14, color: Colors.black45),
-                      SizedBox(width: 4),
-                      Text('1.2K', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                      SizedBox(width: 12),
-                      Icon(Icons.favorite_border, size: 14, color: Colors.black45),
-                      SizedBox(width: 4),
-                      Text('356', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+  Widget _buildLatestPoemCard(BuildContext context, Map<String, dynamic> poem) {
+    final poetName = (poem['poet'] as Map?)?['fullName']?.toString();
+    return GestureDetector(
+      onTap: () => context.push('/poems/${poem['id']}'),
+      child: Card(
+        elevation: 0,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(poem['title']?.toString() ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              if (poetName != null) ...[
+                const SizedBox(height: 4),
+                Text('للشاعر: $poetName', style: const TextStyle(fontSize: 13, color: Colors.black54)),
+              ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildPoetsRow() {
+  Widget _buildPoetsRow(BuildContext context) {
     return SizedBox(
       height: 90,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         reverse: true,
-        itemCount: _kPoets.length,
+        itemCount: _poets.length,
         separatorBuilder: (_, __) => const SizedBox(width: 14),
         itemBuilder: (context, index) {
-          final poet = _kPoets[index];
+          final poet = _poets[index];
           return SizedBox(
             width: 68,
-            child: Column(
-              children: [
-                CircleAvatar(radius: 30, backgroundImage: AssetImage(poet.image)),
-                const SizedBox(height: 6),
-                Text(
-                  poet.name,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 11, color: _kBrown),
-                ),
-              ],
+            child: GestureDetector(
+              onTap: () => context.push('/poets/${poet['id']}'),
+              child: Column(
+                children: [
+                  const CircleAvatar(radius: 30, child: Icon(Icons.person_outline)),
+                  const SizedBox(height: 6),
+                  Text(
+                    poet['fullName']?.toString() ?? '',
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 11, color: _kBrown),
+                  ),
+                ],
+              ),
             ),
           );
         },
