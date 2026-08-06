@@ -16,6 +16,9 @@ import { GraphModule } from './modules/graph/graph.module';
 import { SuggestionsModule } from './modules/suggestions/suggestions.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { IngestionModule } from './modules/ingestion/ingestion.module';
+import { SourcesModule } from './modules/sources/sources.module';
+import { RightsModule } from './modules/rights/rights.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -35,6 +38,9 @@ import { IngestionModule } from './modules/ingestion/ingestion.module';
     SuggestionsModule,
     ModerationModule,
     IngestionModule,
+    SourcesModule,
+    RightsModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}

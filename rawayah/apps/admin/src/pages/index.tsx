@@ -10,6 +10,10 @@ export default function AdminHome() {
         <Link href="/content">المحتوى</Link> |
         <Link href="/ingestion">الاستيراد والمراجعة</Link> |
         <Link href="/suggestions">اقتراحات المستخدمين</Link> |
+        <Link href="/sources">المصادر</Link> |
+        <Link href="/rights">الحقوق</Link> |
+        <Link href="/relations">العلاقات</Link> |
+        <Link href="/settings">الإعدادات</Link> |
         <Link href="/logs">سجل المراجعة</Link> |
         <Link href="/login">تسجيل دخول الإدارة</Link>
       </section>
