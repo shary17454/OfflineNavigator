@@ -6,6 +6,8 @@ export default function AdminHome() {
         <h2>المراجعات العاجلة</h2>
         <a href="/users">المستخدمون</a> |
         <a href="/content">المحتوى</a> |
+        <a href="/ingestion">الاستيراد والمراجعة</a> |
+        <a href="/suggestions">اقتراحات المستخدمين</a> |
         <a href="/logs">سجل المراجعة</a> |
         <a href="/login">تسجيل دخول الإدارة</a>
       </section>
