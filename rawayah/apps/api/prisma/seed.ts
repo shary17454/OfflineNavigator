@@ -20,13 +20,14 @@ async function upsertPermission(code: string, nameAr: string) {
 }
 
 async function main() {
-  const [userRole, contributor, reviewer, editor, admin, superAdmin] = await Promise.all([
+  const [userRole, contributor, reviewer, editor, admin, superAdmin, owner] = await Promise.all([
     upsertRole('USER', 'مستخدم'),
     upsertRole('CONTRIBUTOR', 'مساهم'),
     upsertRole('REVIEWER', 'مراجع'),
     upsertRole('EDITOR', 'محرر'),
     upsertRole('ADMIN', 'مدير'),
     upsertRole('SUPER_ADMIN', 'مشرف أعلى'),
+    upsertRole('OWNER', 'مالك النظام'),
   ]);
 
   const perms = await Promise.all([
@@ -34,6 +35,17 @@ async function main() {
     upsertPermission('content:review', 'مراجعة المحتوى'),
     upsertPermission('content:publish', 'نشر المحتوى'),
     upsertPermission('admin:read', 'الوصول للإدارة'),
+    // صلاحيات دقيقة محصورة على OWNER فقط — لا تُمنح لأي دور آخر ضمن هذا الملف.
+    upsertPermission('content:create', 'إنشاء محتوى جديد'),
+    upsertPermission('content:edit', 'تعديل المحتوى'),
+    upsertPermission('content:delete', 'حذف المحتوى'),
+    upsertPermission('content:import', 'استيراد البيانات'),
+    upsertPermission('content:merge', 'دمج السجلات المكررة'),
+    upsertPermission('rights:manage', 'إدارة الحقوق'),
+    upsertPermission('sources:manage', 'إدارة المصادر'),
+    upsertPermission('categories:manage', 'إدارة التصنيفات'),
+    upsertPermission('users:manage', 'إدارة المستخدمين والأدوار'),
+    upsertPermission('settings:manage', 'إدارة إعدادات النظام'),
   ]);
 
   const findPerm = (code: string) => perms.find((p) => p.code === code)!;
@@ -59,11 +71,19 @@ async function main() {
       create: { roleId: editor.id, permissionId: p.id },
     });
   }
-  for (const p of perms) {
+  for (const p of [findPerm('content:submit'), findPerm('content:review'), findPerm('content:publish'), findPerm('admin:read')]) {
     await prisma.rolePermission.upsert({
       where: { roleId_permissionId: { roleId: admin.id, permissionId: p.id } },
       update: {},
       create: { roleId: admin.id, permissionId: p.id },
+    });
+  }
+  // OWNER يحصل على كل الصلاحيات دون استثناء — هو المصدر الوحيد للإضافة/التعديل/الحذف/الاستيراد/النشر.
+  for (const p of perms) {
+    await prisma.rolePermission.upsert({
+      where: { roleId_permissionId: { roleId: owner.id, permissionId: p.id } },
+      update: {},
+      create: { roleId: owner.id, permissionId: p.id },
     });
   }
 

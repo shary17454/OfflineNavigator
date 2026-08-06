@@ -34,7 +34,7 @@ export class MediaController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
-  @Permissions('admin:write')
+  @Permissions('content:create')
   @UseGuards(PermissionGuard)
   async upload(@CurrentUser() user: any, @UploadedFile() file: UploadedFile, @Body() body: { contentType: string; contentId: string; contentCategory: 'audio' | 'video' }) {
     if (!file) throw new ForbiddenException('الملف مطلوب');

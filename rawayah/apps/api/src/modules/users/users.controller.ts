@@ -35,14 +35,14 @@ export class UsersController {
 
   @Post(':id/activate')
   @UseGuards(PermissionGuard)
-  @Permissions('admin:write')
+  @Permissions('users:manage')
   activate(@Param('id') id: string) {
     return this.svc.updateStatus(id, 'ACTIVE');
   }
 
   @Post(':id/ban')
   @UseGuards(PermissionGuard)
-  @Permissions('admin:write')
+  @Permissions('users:manage')
   ban(@Param('id') id: string) {
     return this.svc.updateStatus(id, 'BANNED');
   }

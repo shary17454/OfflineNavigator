@@ -1,7 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { verify as verifyOtp } from 'otplib';
 import { PrismaService } from '../../shared/prisma/prisma.service';
-import { LoginDto, RefreshDto, RegisterDto } from './dto/auth.dto';
+import { ChangePasswordDto, LoginDto, RefreshDto, RegisterDto, Verify2FADto } from './dto/auth.dto';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -31,13 +32,65 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+      include: { userRoles: { include: { role: true } } },
+    });
     if (!user) throw new UnauthorizedException('بيانات الدخول غير صحيحة');
     const valid = await argon2.verify(user.passwordHash, dto.password);
     if (!valid) throw new UnauthorizedException('بيانات الدخول غير صحيحة');
 
+    const isOwner = user.userRoles.some((ur) => ur.role.code === 'OWNER');
+
+    if (isOwner) {
+      // حسابات OWNER تمر إلزاميًا بالتحقق الثنائي قبل صدور أي رمز وصول كامل.
+      const pendingToken = await this.jwt.signAsync(
+        { sub: user.id, pending2fa: true },
+        { secret: process.env.JWT_SECRET, expiresIn: '5m' },
+      );
+      return { requires2FA: true, pendingToken };
+    }
+
     await this.prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
-    return this.issueTokens(user.id);
+    const tokens = await this.issueTokens(user.id);
+    return { ...tokens, mustChangePassword: user.mustChangePassword };
+  }
+
+  async verify2FA(dto: Verify2FADto) {
+    let payload: { sub: string; pending2fa?: boolean };
+    try {
+      payload = await this.jwt.verifyAsync(dto.pendingToken, { secret: process.env.JWT_SECRET });
+    } catch {
+      throw new UnauthorizedException('رمز الجلسة المؤقت غير صالح أو منتهي');
+    }
+    if (!payload.pending2fa) throw new UnauthorizedException('رمز غير صالح لهذا الغرض');
+
+    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    if (!user?.twoFactorSecret) throw new UnauthorizedException('لم يتم إعداد المصادقة الثنائية لهذا الحساب');
+
+    const result = await verifyOtp({ secret: user.twoFactorSecret, token: dto.code, epochTolerance: 1 });
+    if (!result.valid) throw new UnauthorizedException('رمز التحقق غير صحيح');
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date(), twoFactorEnabled: true },
+    });
+
+    const tokens = await this.issueTokens(user.id);
+    return { ...tokens, mustChangePassword: user.mustChangePassword };
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('المستخدم غير موجود');
+    const valid = await argon2.verify(user.passwordHash, dto.currentPassword);
+    if (!valid) throw new UnauthorizedException('كلمة المرور الحالية غير صحيحة');
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: await argon2.hash(dto.newPassword), mustChangePassword: false },
+    });
+    return { success: true };
   }
 
   async refresh(dto: RefreshDto) {

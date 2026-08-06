@@ -33,3 +33,26 @@ export class RefreshDto {
   @IsString()
   refreshToken!: string;
 }
+
+export class Verify2FADto {
+  @ApiProperty()
+  @IsString()
+  pendingToken!: string;
+
+  @ApiProperty({ example: '123456' })
+  @IsString()
+  @MinLength(6)
+  code!: string;
+}
+
+export class ChangePasswordDto {
+  @ApiProperty()
+  @IsString()
+  @MinLength(8)
+  currentPassword!: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(8)
+  newPassword!: string;
+}

@@ -57,8 +57,9 @@ export class ContentController {
     return this.svc.sectionsConfig();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiBearerAuth()
+  @Permissions('content:create')
   @Post('poems')
   createPoem(@CurrentUser() user: any, @Body() dto: CreatePoemDto) {
     return this.svc.createPoem(dto, user.id);

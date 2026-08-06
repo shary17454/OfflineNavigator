@@ -29,7 +29,7 @@ export class PaymentsController {
   }
 
   @UseGuards(PermissionGuard)
-  @Permissions('admin:write')
+  @Permissions('settings:manage')
   @Post('plans')
   createPlan(@Body() body: { code: string; nameAr: string; priceCents: number; periodDays: number }) {
     return this.svc.createPlan(body);
