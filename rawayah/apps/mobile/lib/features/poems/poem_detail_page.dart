@@ -30,11 +30,11 @@ class PoemDetailPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(poem['title']?.toString() ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kBrown)),
+            Text(poem['title']?.toString() ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             if (poet != null)
               GestureDetector(
                 onTap: () => context.push('/poets/${poet['id']}'),
-                child: Text('للشاعر: ${poet['fullName']}', style: const TextStyle(color: kGold)),
+                child: Text('للشاعر: ${poet['fullName']}', style: TextStyle(color: context.rawaya.gold)),
               ),
             const SizedBox(height: 8),
             if (poem['occasion'] != null) Text('المناسبة: ${poem['occasion']}'),
@@ -42,7 +42,7 @@ class PoemDetailPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             if (attributions.isNotEmpty) ...[
-              const Text('حالة نسبة القصيدة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kBrown)),
+              Text('حالة نسبة القصيدة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
               const SizedBox(height: 6),
               ...attributions.map((a) {
                 final disputed = a['consensus'] == 'DISPUTED';
@@ -58,14 +58,14 @@ class PoemDetailPage extends StatelessWidget {
               const SizedBox(height: 16),
             ],
 
-            const Text('روايات القصيدة', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: kBrown)),
+            Text('روايات القصيدة', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             const SizedBox(height: 8),
             if (versions.isEmpty) const Text('لا توجد نسخة مُفصَّلة بأبيات بعد لهذه القصيدة — راجع النص العام أدناه إن وُجد.'),
             ...versions.map((version) => _VersionCard(version: version)),
 
             if (poem['body'] != null && (poem['body'] as String).isNotEmpty) ...[
               const SizedBox(height: 16),
-              const Text('النص العام', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: kBrown)),
+              Text('النص العام', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
               const SizedBox(height: 8),
               Text(poem['body'].toString(), style: const TextStyle(height: 1.8)),
             ],
@@ -103,7 +103,7 @@ class _VersionCard extends StatelessWidget {
             if (version['sourceNotes'] != null)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Text('المصدر: ${version['sourceNotes']}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                child: Text('المصدر: ${version['sourceNotes']}', style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary)),
               ),
             const SizedBox(height: 8),
             for (final verse in verses) _VerseTile(verse: verse),
@@ -132,7 +132,7 @@ class _VerseTile extends StatelessWidget {
           if (verse['explanation'] != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text('الشرح: ${verse['explanation']}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              child: Text('الشرح: ${verse['explanation']}', style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary)),
             ),
           if (variants.isNotEmpty)
             Padding(

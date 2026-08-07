@@ -39,7 +39,7 @@ class _PoliciesListPageState extends State<PoliciesListPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('الشروط والسياسات')),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -51,7 +51,7 @@ class _PoliciesListPageState extends State<PoliciesListPage> {
                     itemBuilder: (context, index) {
                       final doc = _docs[index];
                       return ListTile(
-                        leading: const Icon(Icons.description_outlined, color: kGold),
+                        leading: Icon(Icons.description_outlined, color: context.rawaya.gold),
                         title: Text(doc['titleAr']?.toString() ?? ''),
                         subtitle: Text('الإصدار ${doc['version']}'),
                         trailing: const Icon(Icons.chevron_left),
@@ -100,7 +100,7 @@ class _PolicyDetailPageState extends State<PolicyDetailPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: Text(_doc?['titleAr']?.toString() ?? 'وثيقة')),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -111,12 +111,12 @@ class _PolicyDetailPageState extends State<PolicyDetailPage> {
                     children: [
                       Text(
                         'الإصدار ${_doc!['version']}',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         _doc!['bodyAr']?.toString() ?? '',
-                        style: const TextStyle(height: 1.9, color: kBrown),
+                        style: TextStyle(height: 1.9, color: context.rawaya.textPrimary),
                       ),
                       const SizedBox(height: 32),
                     ],

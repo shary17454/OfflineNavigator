@@ -137,7 +137,7 @@ class _ContributorApplyPageState extends State<ContributorApplyPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('طلب عضوية مهنية')),
         body: Form(
           key: _formKey,
@@ -165,7 +165,7 @@ class _ContributorApplyPageState extends State<ContributorApplyPage> {
                 'بيانات تظهر للعامة بعد القبول',
                 'هذه البيانات ستكون مرئية لزوار التطبيق.',
                 Icons.public,
-                const Color(0xFF1B5E20),
+                context.rawaya.success,
               ),
               _field(_publicDisplayName, 'الاسم الذي تريد ظهوره للعامة', required: true),
               _field(_publicBio, 'نبذة عنك', required: true, maxLines: 3, minLength: 20),
@@ -178,7 +178,7 @@ class _ContributorApplyPageState extends State<ContributorApplyPage> {
                 'بيانات للتحقق فقط — لا تُنشر للعامة',
                 'تُستخدم للتحقق من صفتك ولا تظهر في أي صفحة عامة.',
                 Icons.lock_outline,
-                const Color(0xFF8D6E00),
+                context.rawaya.warning,
               ),
               _field(_privateFullName, 'الاسم الكامل', required: true, minLength: 4),
               _field(_privateEmail, 'البريد الإلكتروني', required: true, email: true),
@@ -209,7 +209,7 @@ class _ContributorApplyPageState extends State<ContributorApplyPage> {
               ),
 
               const SizedBox(height: 24),
-              _sectionHeader('الموافقات المطلوبة', '', Icons.assignment_turned_in_outlined, kGold),
+              _sectionHeader('الموافقات المطلوبة', '', Icons.assignment_turned_in_outlined, context.rawaya.gold),
 
               if (_loadingConsent)
                 const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator()))
@@ -217,19 +217,22 @@ class _ContributorApplyPageState extends State<ContributorApplyPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFE3D6BE)),
+                    color: context.rawaya.surface,
+                    border: Border.all(color: context.rawaya.border),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_consentText!, style: const TextStyle(height: 1.7, fontSize: 13)),
+                      Text(
+                        _consentText!,
+                        style: TextStyle(height: 1.7, fontSize: 13, color: context.rawaya.textPrimary),
+                      ),
                       if (_scopes.isNotEmpty) ...[
                         const Divider(height: 20),
                         Text(
                           'البيانات المشمولة بالموافقة: ${_scopes.length} عنصرًا',
-                          style: const TextStyle(fontSize: 12, color: Colors.black54),
+                          style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
                         ),
                       ],
                     ],
@@ -259,21 +262,21 @@ class _ContributorApplyPageState extends State<ContributorApplyPage> {
                   child: Text(
                     _message!,
                     style: TextStyle(
-                      color: _message!.startsWith('تم') ? Colors.green.shade800 : Colors.red.shade800,
+                      color: _message!.startsWith('تم') ? context.rawaya.success : context.rawaya.danger,
                     ),
                   ),
                 ),
 
               const SizedBox(height: 12),
               FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: kGold),
+                style: FilledButton.styleFrom(backgroundColor: context.rawaya.gold),
                 onPressed: _submitting ? null : _submit,
                 child: Text(_submitting ? 'جارٍ الإرسال…' : 'إرسال الطلب'),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'ملاحظة: قبول العضوية يتيح لك إضافة المواد، وتبقى كل مادة قيد مراجعة المالك قبل نشرها.',
-                style: TextStyle(fontSize: 12, color: Colors.black54),
+                style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
               ),
               const SizedBox(height: 24),
             ],
@@ -301,7 +304,7 @@ class _ContributorApplyPageState extends State<ContributorApplyPage> {
           if (subtitle.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 4, right: 26),
-              child: Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              child: Text(subtitle, style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary)),
             ),
         ],
       ),
@@ -323,9 +326,6 @@ class _ContributorApplyPageState extends State<ContributorApplyPage> {
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: required ? '$label *' : label,
-          border: const OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.white,
         ),
         validator: (value) {
           final v = (value ?? '').trim();

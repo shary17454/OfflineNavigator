@@ -75,7 +75,7 @@ class _MyContributionsPageState extends State<MyContributionsPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('مساهماتي')),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -92,7 +92,7 @@ class _MyContributionsPageState extends State<MyContributionsPage> {
                           ),
                           const SizedBox(height: 12),
                           FilledButton(
-                            style: FilledButton.styleFrom(backgroundColor: kGold),
+                            style: FilledButton.styleFrom(backgroundColor: context.rawaya.gold),
                             onPressed: () => context.push('/contributors/apply'),
                             child: const Text('تقديم طلب عضوية'),
                           ),
@@ -144,7 +144,7 @@ class _MyContributionsPageState extends State<MyContributionsPage> {
                                         padding: const EdgeInsets.only(top: 6),
                                         child: Text(
                                           'ملاحظة المراجعة: ${item['reviewNotes']}',
-                                          style: const TextStyle(fontSize: 12, color: Colors.black54),
+                                          style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
                                         ),
                                       ),
                                   ],

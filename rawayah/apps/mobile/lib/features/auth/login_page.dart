@@ -79,7 +79,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: Text(_pendingToken != null ? 'التحقق الثنائي' : 'تسجيل الدخول')),
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -104,11 +104,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           decoration: const InputDecoration(labelText: 'كلمة المرور', border: OutlineInputBorder()),
         ),
         const SizedBox(height: 20),
-        if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
+        if (_error != null) Text(_error!, style: TextStyle(color: context.rawaya.danger)),
         const SizedBox(height: 8),
         FilledButton(
           onPressed: _loading ? null : _submitLogin,
-          style: FilledButton.styleFrom(backgroundColor: kGold),
+          style: FilledButton.styleFrom(backgroundColor: context.rawaya.gold),
           child: _loading ? const CircularProgressIndicator() : const Text('دخول'),
         ),
         const SizedBox(height: 12),
@@ -132,10 +132,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           maxLength: 6,
           decoration: const InputDecoration(labelText: 'رمز التحقق', border: OutlineInputBorder()),
         ),
-        if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
+        if (_error != null) Text(_error!, style: TextStyle(color: context.rawaya.danger)),
         FilledButton(
           onPressed: _loading ? null : _submit2FA,
-          style: FilledButton.styleFrom(backgroundColor: kGold),
+          style: FilledButton.styleFrom(backgroundColor: context.rawaya.gold),
           child: _loading ? const CircularProgressIndicator() : const Text('تأكيد'),
         ),
       ],

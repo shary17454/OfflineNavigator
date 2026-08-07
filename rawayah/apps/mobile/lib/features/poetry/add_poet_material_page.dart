@@ -172,7 +172,7 @@ class _AddPoetMaterialPageState extends State<AddPoetMaterialPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('إضافة مادة')),
         body: Form(
           key: _formKey,
@@ -182,26 +182,21 @@ class _AddPoetMaterialPageState extends State<AddPoetMaterialPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF6E0),
-                  border: Border.all(color: kGold),
+                  color: context.rawaya.warningSurface,
+                  border: Border.all(color: context.rawaya.gold),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
+                child: Text(
                   'تُحفظ المادة كمسودة ثم تُرسل للمراجعة. لا تُنشر إلا بعد اعتماد المالك '
                   'وتحديد حالة حقوقها. لا تَرفع مادة لا تملك حق نشرها.',
-                  style: TextStyle(fontSize: 12, color: kBrown, height: 1.6),
+                  style: TextStyle(fontSize: 12, color: context.rawaya.textPrimary, height: 1.6),
                 ),
               ),
               const SizedBox(height: 16),
 
               DropdownButtonFormField<String>(
                 initialValue: _kind,
-                decoration: const InputDecoration(
-                  labelText: 'نوع المادة',
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
+                decoration: const InputDecoration(labelText: 'نوع المادة'),
                 items: [
                   for (final entry in _kindLabels.entries)
                     DropdownMenuItem(value: entry.key, child: Text(entry.value)),
@@ -236,7 +231,7 @@ class _AddPoetMaterialPageState extends State<AddPoetMaterialPage> {
                     padding: const EdgeInsets.only(top: 8),
                     child: Row(
                       children: [
-                        const Icon(Icons.check_circle, color: Colors.green, size: 18),
+                        Icon(Icons.check_circle, color: context.rawaya.success, size: 18),
                         const SizedBox(width: 6),
                         Expanded(child: Text(_uploadedFileName!, style: const TextStyle(fontSize: 13))),
                       ],
@@ -246,13 +241,13 @@ class _AddPoetMaterialPageState extends State<AddPoetMaterialPage> {
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
                     'الصيغ المسموحة: ${(_allowedExtensions[_kind] ?? const []).join('، ')}',
-                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
                   ),
                 ),
               ],
 
               const SizedBox(height: 16),
-              const Text('تفاصيل التوثيق', style: TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
+              Text('تفاصيل التوثيق', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
               const SizedBox(height: 8),
               _field(_occasion, 'المناسبة'),
               _field(_materialDate, 'التاريخ (إن وُجد)'),
@@ -268,15 +263,15 @@ class _AddPoetMaterialPageState extends State<AddPoetMaterialPage> {
                     _message!,
                     style: TextStyle(
                       color: _message!.startsWith('تم') || _message!.startsWith('حُفظت')
-                          ? Colors.green.shade800
-                          : Colors.red.shade800,
+                          ? context.rawaya.success
+                          : context.rawaya.danger,
                     ),
                   ),
                 ),
 
               const SizedBox(height: 12),
               FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: kGold),
+                style: FilledButton.styleFrom(backgroundColor: context.rawaya.gold),
                 onPressed: (_submitting || _done) ? null : _submit,
                 child: Text(_submitting ? 'جارٍ الحفظ…' : 'حفظ كمسودة'),
               ),
@@ -300,12 +295,7 @@ class _AddPoetMaterialPageState extends State<AddPoetMaterialPage> {
       child: TextFormField(
         controller: controller,
         maxLines: maxLines,
-        decoration: InputDecoration(
-          labelText: required ? '$label *' : label,
-          border: const OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.white,
-        ),
+        decoration: InputDecoration(labelText: required ? '$label *' : label),
         validator: (value) {
           final v = (value ?? '').trim();
           if (required && v.isEmpty) return 'هذا الحقل مطلوب';

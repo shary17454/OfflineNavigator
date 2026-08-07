@@ -46,7 +46,7 @@ class _CreateQuestionPageState extends State<CreateQuestionPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('طرح سؤال جديد')),
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -76,10 +76,10 @@ class _CreateQuestionPageState extends State<CreateQuestionPage> {
                 decoration: const InputDecoration(labelText: 'تفاصيل السؤال', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 20),
-              if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
+              if (_error != null) Text(_error!, style: TextStyle(color: context.rawaya.danger)),
               FilledButton(
                 onPressed: _sending ? null : _submit,
-                style: FilledButton.styleFrom(backgroundColor: kGold),
+                style: FilledButton.styleFrom(backgroundColor: context.rawaya.gold),
                 child: _sending ? const CircularProgressIndicator() : const Text('إرسال السؤال'),
               ),
             ],

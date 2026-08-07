@@ -61,8 +61,16 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
-        appBar: AppBar(title: const Text('حسابي')),
+        appBar: AppBar(
+          title: const Text('حسابي'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: 'الإعدادات',
+              onPressed: () => context.push('/settings'),
+            ),
+          ],
+        ),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
             : _me == null
@@ -76,33 +84,33 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                       OutlinedButton(onPressed: _logout, child: const Text('تسجيل الخروج')),
 
                       const Divider(height: 32),
-                      const Text('العضوية المهنية', style: TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
+                      Text('العضوية المهنية', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'الرواة والمؤرخون المعتمدون يمكنهم إضافة المواد، وتبقى كل مادة قيد مراجعة المالك قبل نشرها.',
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.badge_outlined, color: kGold),
+                        leading: Icon(Icons.badge_outlined, color: context.rawaya.gold),
                         title: const Text('تقديم طلب عضوية (راوٍ / مؤرخ)'),
                         onTap: () => context.push('/contributors/apply'),
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.fact_check_outlined, color: kGold),
+                        leading: Icon(Icons.fact_check_outlined, color: context.rawaya.gold),
                         title: const Text('مساهماتي وحالة مراجعتها'),
                         onTap: () => context.push('/my-contributions'),
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.privacy_tip_outlined, color: kGold),
+                        leading: Icon(Icons.privacy_tip_outlined, color: context.rawaya.gold),
                         title: const Text('الشروط والسياسات'),
                         onTap: () => context.push('/policies'),
                       ),
 
                       const Divider(height: 32),
-                      const Text('تصدير بياناتي', style: TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
+                      Text('تصدير بياناتي', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
                       const SizedBox(height: 8),
                       const Text('يمكنك طلب نسخة من كل بياناتك الشخصية على المنصة.'),
                       TextButton(
@@ -112,20 +120,20 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                         child: const Text('تصدير بياناتي'),
                       ),
                       const Divider(height: 32),
-                      const Text('حذف الحساب', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                      Text('حذف الحساب', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.danger)),
                       const SizedBox(height: 8),
                       const Text('عملية نهائية: يُحذف كل ما هو تفضيل شخصي فعليًا، وتُنزع هويتك عن بريدك وكلمة مرورك بشكل غير قابل للاسترجاع.'),
                       if (!_confirmDelete)
                         TextButton(
                           onPressed: () => setState(() => _confirmDelete = true),
-                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          style: TextButton.styleFrom(foregroundColor: context.rawaya.danger),
                           child: const Text('حذف حسابي'),
                         )
                       else ...[
                         TextField(
                           controller: _passwordController,
                           obscureText: true,
-                          decoration: const InputDecoration(labelText: 'كلمة المرور للتأكيد', border: OutlineInputBorder()),
+                          decoration: const InputDecoration(labelText: 'كلمة المرور للتأكيد'),
                         ),
                         const SizedBox(height: 8),
                         Row(
@@ -136,13 +144,17 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                             ),
                             FilledButton(
                               onPressed: _deleteAccount,
-                              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                              style: FilledButton.styleFrom(backgroundColor: context.rawaya.danger),
                               child: const Text('تأكيد الحذف النهائي'),
                             ),
                           ],
                         ),
                       ],
-                      if (_message != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_message!, style: const TextStyle(color: Colors.red))),
+                      if (_message != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(_message!, style: TextStyle(color: context.rawaya.danger)),
+                        ),
                     ],
                   ),
       ),

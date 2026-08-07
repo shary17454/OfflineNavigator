@@ -26,7 +26,7 @@ class QuestionsPage extends StatelessWidget {
           bottom: 16,
           left: 16,
           child: FloatingActionButton(
-            backgroundColor: kGold,
+            backgroundColor: context.rawaya.gold,
             onPressed: () => context.push('/questions/new'),
             child: const Icon(Icons.add),
           ),

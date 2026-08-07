@@ -13,7 +13,7 @@ class _StaticScaffold extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: Text(title)),
         body: ListView(padding: const EdgeInsets.all(20), children: children),
       ),
@@ -21,12 +21,12 @@ class _StaticScaffold extends StatelessWidget {
   }
 }
 
-Widget _section(String heading, String body) => Padding(
+Widget _section(BuildContext context, String heading, String body) => Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(heading, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kBrown)),
+          Text(heading, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: context.rawaya.textPrimary)),
           const SizedBox(height: 6),
           Text(body, style: const TextStyle(height: 1.7)),
         ],
@@ -38,10 +38,10 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _StaticScaffold(
+    return _StaticScaffold(
       title: 'عن التطبيق',
       children: [
-        Text('موروث — ذاكرة التراث العربي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kBrown)),
+        Text('موروث — ذاكرة التراث العربي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
         SizedBox(height: 12),
         Text(
           'منصة عربية رقمية لحفظ وتنظيم وعرض التراث العربي وتراث الجزيرة العربية والبادية: الشعر والشعراء، القصص '
@@ -65,17 +65,19 @@ class PrivacyPage extends StatelessWidget {
       title: 'سياسة الخصوصية',
       children: [
         _section(
+          context,
           'البيانات التي نجمعها',
           'البريد الإلكتروني وكلمة المرور (مُشفَّرة، لا تُخزَّن كنص صريح أبدًا)، الاسم الظاهر، وأي محتوى تُنشئه بنفسك '
               'على المنصة (مفضلة، متابعات، أسئلة، إجابات، تعليقات، اقتراحات، بلاغات).',
         ),
         _section(
+          context,
           'حقك في حذف بياناتك',
           'من صفحة "حسابي" يمكنك تصدير نسخة من بياناتك أو حذف حسابك نهائيًا — حذف فعلي لا شكلي، ينزع بريدك وكلمة '
               'مرورك الحقيقيين بشكل غير قابل للاسترجاع.',
         ),
-        _section('من يرى بياناتك', 'لا نبيع بياناتك ولا نشاركها مع أي طرف ثالث لأغراض تسويقية.'),
-        _section('ملاحظة', 'هذه المنصة في مرحلة تطوير مبكرة (MVP). ستُحدَّث هذه السياسة كلما تغيّرت الممارسات الفعلية للمنصة.'),
+        _section(context, 'من يرى بياناتك', 'لا نبيع بياناتك ولا نشاركها مع أي طرف ثالث لأغراض تسويقية.'),
+        _section(context, 'ملاحظة', 'هذه المنصة في مرحلة تطوير مبكرة (MVP). ستُحدَّث هذه السياسة كلما تغيّرت الممارسات الفعلية للمنصة.'),
       ],
     );
   }
@@ -90,16 +92,18 @@ class TermsPage extends StatelessWidget {
       title: 'شروط الاستخدام',
       children: [
         _section(
+          context,
           'طبيعة المحتوى',
           'كل مادة تراثية منشورة تحمل مصدرًا موثَّقًا. المحتوى المختلف حوله الروايات يُوسم صراحة، ولا يُقدَّم كحقيقة '
               'مطلقة.',
         ),
         _section(
+          context,
           'مسؤوليتك كمستخدم',
           'إضافة المحتوى الرسمي محصورة بمالك المنصة بعد مراجعة وتحقق. المستخدم العادي يمكنه التصفح والبحث والحفظ '
               'والمتابعة، واقتراح تصحيح أو مصدر، أو الإبلاغ عن خطأ — لا نشر محتوى مباشر.',
         ),
-        _section('الملكية الفكرية', 'لا يُنشر أي محتوى محمي بحقوق نشر غير واضحة الترخيص.'),
+        _section(context, 'الملكية الفكرية', 'لا يُنشر أي محتوى محمي بحقوق نشر غير واضحة الترخيص.'),
       ],
     );
   }

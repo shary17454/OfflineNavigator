@@ -19,7 +19,7 @@ class PoetDetailPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(poet['fullName']?.toString() ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kBrown)),
+            Text(poet['fullName']?.toString() ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             if (poet['knownAs'] != null) Text('يُعرف بـ: ${poet['knownAs']}'),
             const SizedBox(height: 8),
             if (poet['era'] != null) Text('العصر: ${poet['era']}'),
@@ -29,13 +29,13 @@ class PoetDetailPage extends StatelessWidget {
             const SizedBox(height: 16),
             // مدخل مكتبة الشاعر: تجمع كل المواد المرتبطة به بكل أشكالها.
             FilledButton.icon(
-              style: FilledButton.styleFrom(backgroundColor: kGold),
+              style: FilledButton.styleFrom(backgroundColor: context.rawaya.gold),
               onPressed: () => context.push('/poets/$poetId/library'),
               icon: const Icon(Icons.folder_special_outlined),
               label: const Text('مكتبة الشاعر'),
             ),
             const SizedBox(height: 20),
-            const Text('قصائد الشاعر', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: kBrown)),
+            Text('قصائد الشاعر', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             const SizedBox(height: 8),
             ...poems.map(
               (poem) => Card(

@@ -50,11 +50,11 @@ class _QuestionDetailPageState extends State<QuestionDetailPage> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  Text(question['title']?.toString() ?? '', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: kBrown)),
+                  Text(question['title']?.toString() ?? '', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
                   const SizedBox(height: 8),
                   Text(question['description']?.toString() ?? ''),
                   const SizedBox(height: 20),
-                  Text('الإجابات (${answers.length})', style: const TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
+                  Text('الإجابات (${answers.length})', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
                   const SizedBox(height: 8),
                   ...answers.map(
                     (a) => Card(
@@ -83,13 +83,13 @@ class _QuestionDetailPageState extends State<QuestionDetailPage> {
                     ),
                     IconButton(
                       onPressed: _sending ? null : _sendAnswer,
-                      icon: const Icon(Icons.send, color: kGold),
+                      icon: Icon(Icons.send, color: context.rawaya.gold),
                     ),
                   ],
                 ),
               ),
             ),
-            if (_message != null) Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(_message!, style: const TextStyle(color: Colors.red))),
+            if (_message != null) Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(_message!, style: TextStyle(color: context.rawaya.danger))),
           ],
         );
       },

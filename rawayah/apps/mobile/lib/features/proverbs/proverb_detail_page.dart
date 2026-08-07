@@ -17,7 +17,7 @@ class ProverbDetailPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(proverb['phrase']?.toString() ?? '', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: kBrown)),
+            Text(proverb['phrase']?.toString() ?? '', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             const SizedBox(height: 12),
             Text(proverb['explanation']?.toString() ?? '', style: const TextStyle(height: 1.8)),
             if (proverb['story'] != null) ...[

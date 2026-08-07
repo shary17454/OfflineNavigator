@@ -74,8 +74,13 @@ class _PoetrySectionsPageState extends State<PoetrySectionsPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
-        appBar: AppBar(title: const Text('الشعر')),
+        appBar: AppBar(
+          title: const Text('الشعر'),
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(9),
+            child: Padding(padding: EdgeInsets.only(bottom: 8), child: RawayaGoldDivider()),
+          ),
+        ),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
             : _error != null
@@ -101,13 +106,13 @@ class _PoetrySectionsPageState extends State<PoetrySectionsPage> {
                                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
                                 child: Row(
                                   children: [
-                                    Icon(_dimensionIcons[dim], size: 20, color: kGold),
+                                    Icon(_dimensionIcons[dim], size: 20, color: context.rawaya.gold),
                                     const SizedBox(width: 8),
                                     Text(
                                       _dimensionLabels[dim] ?? dim,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: kBrown,
+                                        color: context.rawaya.textPrimary,
                                         fontSize: 16,
                                       ),
                                     ),
@@ -122,12 +127,7 @@ class _PoetrySectionsPageState extends State<PoetrySectionsPage> {
                                   children: [
                                     for (final term in _dimensions[dim]!)
                                       ActionChip(
-                                        backgroundColor: Colors.white,
-                                        side: const BorderSide(color: Color(0xFFE3D6BE)),
-                                        label: Text(
-                                          term['nameAr']?.toString() ?? '',
-                                          style: const TextStyle(color: kBrown),
-                                        ),
+                                        label: Text(term['nameAr']?.toString() ?? ''),
                                         onPressed: () => context.push('/poetry/${term['slug']}'),
                                       ),
                                   ],
@@ -180,8 +180,13 @@ class _PoetryTermPageState extends State<PoetryTermPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
-        appBar: AppBar(title: Text(_term?['nameAr']?.toString() ?? 'قصائد القسم')),
+        appBar: AppBar(
+          title: Text(_term?['nameAr']?.toString() ?? 'قصائد القسم'),
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(9),
+            child: Padding(padding: EdgeInsets.only(bottom: 8), child: RawayaGoldDivider()),
+          ),
+        ),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
             : _poems.isEmpty
@@ -191,7 +196,7 @@ class _PoetryTermPageState extends State<PoetryTermPage> {
                     itemBuilder: (context, index) {
                       final poem = _poems[index];
                       return ListTile(
-                        leading: const Icon(Icons.menu_book_outlined, color: kGold),
+                        leading: Icon(Icons.menu_book_outlined, color: context.rawaya.gold),
                         title: Text(poem['title']?.toString() ?? ''),
                         subtitle: poem['summary'] != null ? Text(poem['summary'].toString()) : null,
                         onTap: () => context.push('/poems/${poem['id']}'),

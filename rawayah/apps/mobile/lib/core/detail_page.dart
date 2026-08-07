@@ -47,17 +47,24 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.rawaya;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
-        appBar: AppBar(title: Text(widget.title), actions: widget.actions),
+        appBar: AppBar(
+          title: Text(widget.title),
+          actions: widget.actions,
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(9),
+            child: Padding(padding: EdgeInsets.only(bottom: 8), child: RawayaGoldDivider()),
+          ),
+        ),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
             : _error != null
-                ? Center(child: Text(_error!))
+                ? Center(child: Text(_error!, style: TextStyle(color: c.danger)))
                 : _data == null
-                    ? const Center(child: Text('لا توجد بيانات'))
+                    ? Center(child: Text('لا توجد بيانات', style: TextStyle(color: c.textSecondary)))
                     : widget.builder(context, _data!),
       ),
     );

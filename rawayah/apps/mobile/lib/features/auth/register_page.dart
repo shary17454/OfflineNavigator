@@ -49,7 +49,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('إنشاء حساب جديد')),
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -72,11 +72,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 decoration: const InputDecoration(labelText: 'كلمة المرور (8 أحرف على الأقل)', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 20),
-              if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
+              if (_error != null) Text(_error!, style: TextStyle(color: context.rawaya.danger)),
               const SizedBox(height: 8),
               FilledButton(
                 onPressed: _loading ? null : _submit,
-                style: FilledButton.styleFrom(backgroundColor: kGold),
+                style: FilledButton.styleFrom(backgroundColor: context.rawaya.gold),
                 child: _loading ? const CircularProgressIndicator() : const Text('إنشاء الحساب'),
               ),
             ],

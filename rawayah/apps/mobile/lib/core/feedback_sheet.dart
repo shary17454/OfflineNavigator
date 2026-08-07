@@ -10,6 +10,8 @@ Future<void> showFeedbackSheet(BuildContext context, {required String contentTyp
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    backgroundColor: context.rawaya.surface,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
     builder: (context) => Directionality(
       textDirection: TextDirection.rtl,
       child: _FeedbackSheet(contentType: contentType, contentId: contentId),
@@ -105,8 +107,13 @@ class _FeedbackSheetState extends State<_FeedbackSheet> {
                   : _mode == _Mode.report
                       ? _submitReport
                       : () => _submitSuggestion(_mode == _Mode.correction ? 'CORRECTION' : 'NEW_SOURCE'),
-              style: FilledButton.styleFrom(backgroundColor: kGold),
-              child: _sending ? const CircularProgressIndicator() : const Text('إرسال'),
+              child: _sending
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2.4, color: context.rawaya.onGold),
+                    )
+                  : const Text('إرسال'),
             ),
             const SizedBox(height: 20),
           ],

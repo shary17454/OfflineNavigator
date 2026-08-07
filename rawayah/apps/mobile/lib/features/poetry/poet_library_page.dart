@@ -74,16 +74,16 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Directionality(
+      return Directionality(
         textDirection: TextDirection.rtl,
-        child: Scaffold(backgroundColor: kCream, body: Center(child: CircularProgressIndicator())),
+        child: Scaffold(backgroundColor: context.rawaya.background, body: Center(child: CircularProgressIndicator())),
       );
     }
     if (_error != null || _data == null) {
       return Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
-          backgroundColor: kCream,
+          backgroundColor: context.rawaya.background,
           appBar: AppBar(title: const Text('مكتبة الشاعر')),
           body: Center(child: Text(_error ?? 'الشاعر غير موجود')),
         ),
@@ -103,7 +103,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
         length: tabs.length,
         initialIndex: initialIndex,
         child: Scaffold(
-          backgroundColor: kCream,
+          backgroundColor: context.rawaya.background,
           appBar: AppBar(
             title: Text(poet['fullName']?.toString() ?? 'مكتبة الشاعر'),
             bottom: tabs.isEmpty
@@ -115,7 +115,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
           ),
           floatingActionButton: _canContribute
               ? FloatingActionButton.extended(
-                  backgroundColor: kGold,
+                  backgroundColor: context.rawaya.gold,
                   onPressed: () async {
                     await context.push('/poets/${widget.poetId}/library/add');
                     if (mounted) _load();
@@ -185,19 +185,19 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF6E0),
-              border: Border.all(color: kGold),
+              color: context.rawaya.warningSurface,
+              border: Border.all(color: context.rawaya.gold),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline, size: 18, color: kGold),
+                Icon(Icons.info_outline, size: 18, color: context.rawaya.gold),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'اختلاف المصادر: ${poet['disputeNote']}',
-                    style: const TextStyle(color: kBrown),
+                    style: TextStyle(color: context.rawaya.textPrimary),
                   ),
                 ),
               ],
@@ -207,7 +207,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
 
         if (poet['biography'] != null) ...[
           const SizedBox(height: 20),
-          const Text('السيرة', style: TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
+          Text('السيرة', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
           const SizedBox(height: 8),
           Text(poet['biography'].toString(), style: const TextStyle(height: 1.8)),
         ],
@@ -227,9 +227,9 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
         children: [
           SizedBox(
             width: 110,
-            child: Text(label, style: const TextStyle(color: Colors.black54)),
+            child: Text(label, style: TextStyle(color: context.rawaya.textSecondary)),
           ),
-          Expanded(child: Text(value, style: const TextStyle(color: kBrown))),
+          Expanded(child: Text(value, style: TextStyle(color: context.rawaya.textPrimary))),
         ],
       ),
     );
@@ -245,7 +245,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
       children: [
         for (final p in poems)
           ListTile(
-            leading: const Icon(Icons.menu_book_outlined, color: kGold),
+            leading: Icon(Icons.menu_book_outlined, color: context.rawaya.gold),
             title: Text(p['title']?.toString() ?? ''),
             subtitle: p['summary'] != null ? Text(p['summary'].toString()) : null,
             onTap: () => context.push('/poems/${p['id']}'),
@@ -277,7 +277,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ListTile(
-        leading: Icon(icon, color: kGold),
+        leading: Icon(icon, color: context.rawaya.gold),
         title: Text(item['title']?.toString() ?? ''),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,7 +293,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
                 padding: const EdgeInsets.only(top: 6),
                 child: Text(
                   subtitleParts.join(' • '),
-                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                  style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
                 ),
               ),
           ],
@@ -309,7 +309,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
     return ListView.builder(
       itemCount: stories.length,
       itemBuilder: (context, i) => ListTile(
-        leading: const Icon(Icons.auto_stories_outlined, color: kGold),
+        leading: Icon(Icons.auto_stories_outlined, color: context.rawaya.gold),
         title: Text(stories[i]['title']?.toString() ?? ''),
         onTap: () => context.push('/stories/${stories[i]['id']}'),
       ),
@@ -338,30 +338,30 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
               children: [
                 Text(
                   group['subjectTitle']?.toString() ?? '',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: kBrown, fontSize: 16),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary, fontSize: 16),
                 ),
                 Text(
                   'وردت ${narrations.length} روايات مختلفة',
-                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                  style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
                 ),
                 const SizedBox(height: 4),
                 Container(
                   padding: const EdgeInsets.all(8),
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFF6E0),
+                    color: context.rawaya.warningSurface,
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
+                  child: Text(
                     'تُعرض الروايات كما وردت دون ترجيح إحداها، فالمسألة محل اختلاف بين المصادر.',
-                    style: TextStyle(fontSize: 12, color: kBrown),
+                    style: TextStyle(fontSize: 12, color: context.rawaya.textPrimary),
                   ),
                 ),
                 for (final n in narrations) ...[
                   const Divider(),
                   Text(
                     n['label']?.toString() ?? 'رواية',
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: kGold),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.gold),
                   ),
                   const SizedBox(height: 4),
                   Text(n['body']?.toString() ?? '', style: const TextStyle(height: 1.8)),
@@ -370,7 +370,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
                         'موضع الاختلاف: ${n['differenceNote']}',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF8D6E00)),
+                        style: TextStyle(fontSize: 12, color: context.rawaya.warning),
                       ),
                     ),
                   Padding(
@@ -380,7 +380,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
                         if (n['source'] != null) 'المصدر: ${(n['source'] as Map)['title']}',
                         'مستوى التوثيق: ${_verificationLabel(n['verificationLevel']?.toString())}',
                       ].join(' • '),
-                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
                     ),
                   ),
                 ],
@@ -417,7 +417,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
       itemBuilder: (context, i) {
         final s = sources[i];
         return ListTile(
-          leading: const Icon(Icons.library_books_outlined, color: kGold),
+          leading: Icon(Icons.library_books_outlined, color: context.rawaya.gold),
           title: Text(s['title']?.toString() ?? ''),
           subtitle: Text([
             if (s['author'] != null) s['author'].toString(),

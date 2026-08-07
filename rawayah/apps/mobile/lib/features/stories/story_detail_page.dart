@@ -17,7 +17,7 @@ class StoryDetailPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(story['title']?.toString() ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kBrown)),
+            Text(story['title']?.toString() ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             const SizedBox(height: 8),
             if (story['narrator'] != null) Text('الراوي: ${story['narrator']}'),
             if (story['location'] != null) Text('المكان: ${story['location']}'),

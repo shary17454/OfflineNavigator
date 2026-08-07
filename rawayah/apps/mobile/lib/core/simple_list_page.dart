@@ -54,33 +54,43 @@ class _SimpleListPageState extends State<SimpleListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.rawaya;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
-        appBar: AppBar(title: Text(widget.title)),
+        appBar: AppBar(
+          title: Text(widget.title),
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(9),
+            child: Padding(padding: EdgeInsets.only(bottom: 8), child: RawayaGoldDivider()),
+          ),
+        ),
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
               child: TextField(
                 controller: _controller,
                 onSubmitted: _load,
+                style: TextStyle(color: c.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'بحث في ${widget.title}',
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  prefixIcon: Icon(Icons.search, color: c.textSecondary),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: c.border)),
                 ),
               ),
             ),
-            if (_loading) const LinearProgressIndicator(),
-            if (_error != null) Padding(padding: const EdgeInsets.all(16), child: Text(_error!)),
+            if (_loading) LinearProgressIndicator(color: c.gold, backgroundColor: c.surfaceAlt),
+            if (_error != null)
+              Padding(padding: const EdgeInsets.all(16), child: Text(_error!, style: TextStyle(color: c.danger))),
             if (!_loading && _items.isEmpty && _error == null)
-              Padding(padding: const EdgeInsets.all(32), child: Text(widget.emptyMessage)),
+              Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(widget.emptyMessage, style: TextStyle(color: c.textSecondary)),
+              ),
             Expanded(
               child: RefreshIndicator(
+                color: c.gold,
                 onRefresh: () => _load(_controller.text),
                 child: ListView.builder(
                   itemCount: _items.length,

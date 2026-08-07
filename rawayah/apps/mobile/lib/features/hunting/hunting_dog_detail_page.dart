@@ -17,7 +17,7 @@ class HuntingDogDetailPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(breed['name']?.toString() ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kBrown)),
+            Text(breed['name']?.toString() ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             const SizedBox(height: 12),
             if (breed['origin'] != null) Text('الأصل: ${breed['origin']}'),
             if (breed['traits'] != null) Text('الصفات: ${breed['traits']}'),

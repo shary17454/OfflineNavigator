@@ -43,7 +43,7 @@ class _MediaPageState extends State<MediaPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('الوسائط')),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -63,9 +63,9 @@ class _MediaPageState extends State<MediaPage> {
                     : ListView(
                         children: [
                           if (_audios.isNotEmpty) ...[
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.all(16),
-                              child: Text('التسجيلات الصوتية', style: TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
+                              child: Text('التسجيلات الصوتية', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
                             ),
                             ..._audios.map(
                               (a) => ListTile(
@@ -76,9 +76,9 @@ class _MediaPageState extends State<MediaPage> {
                             ),
                           ],
                           if (_videos.isNotEmpty) ...[
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.all(16),
-                              child: Text('المقاطع المرئية', style: TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
+                              child: Text('المقاطع المرئية', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
                             ),
                             ..._videos.map(
                               (v) => ListTile(

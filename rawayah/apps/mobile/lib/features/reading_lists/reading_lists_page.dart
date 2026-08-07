@@ -61,11 +61,11 @@ class _ReadingListsPageState extends State<ReadingListsPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('المكتبة')),
         floatingActionButton: _needsLogin
             ? null
-            : FloatingActionButton(backgroundColor: kGold, onPressed: _createList, child: const Icon(Icons.add)),
+            : FloatingActionButton(backgroundColor: context.rawaya.gold, onPressed: _createList, child: const Icon(Icons.add)),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
             : _needsLogin

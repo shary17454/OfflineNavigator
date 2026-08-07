@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/api_client.dart';
+import '../../core/theme.dart';
 
 class HeritageCategory {
   const HeritageCategory({required this.title, required this.image, required this.route});
@@ -10,10 +11,6 @@ class HeritageCategory {
   final String image;
   final String route;
 }
-
-const _kBrown = Color(0xFF2A1F14);
-const _kGold = Color(0xFFB68843);
-const _kCream = Color(0xFFFDF7ED);
 
 const _kCategories = [
   // «الشعر» تفتح أقسام الشعر (التصنيفات) لا قائمة القصائد المسطحة.
@@ -79,123 +76,122 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.rawaya;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: _kCream,
         body: SafeArea(
           child: Column(
             children: [
-              _buildHeader(context),
+              _buildHeader(context, c),
               Expanded(
                 child: _loading
                     ? const Center(child: CircularProgressIndicator())
                     : ListView(
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                         children: [
-                          _buildSearchField(context),
-                          const SizedBox(height: 16),
-                          _buildHeroQuote(),
-                          const SizedBox(height: 20),
-                          _sectionTitle('اكتشف التراث'),
+                          _buildSearchField(context, c),
+                          const SizedBox(height: 18),
+                          _buildHeroQuote(c),
+                          const SizedBox(height: 22),
+                          _sectionTitle(c, 'اكتشف التراث'),
                           const SizedBox(height: 10),
-                          _buildCategoriesRow(context),
-                          const SizedBox(height: 20),
-                          _sectionTitle('أحدث القصائد', actionLabel: 'عرض الكل', onAction: () => context.push('/poems')),
+                          _buildCategoriesRow(context, c),
+                          const SizedBox(height: 22),
+                          _sectionTitle(c, 'أحدث القصائد', actionLabel: 'عرض الكل', onAction: () => context.push('/poems')),
                           const SizedBox(height: 10),
-                          if (_latestPoem != null) _buildLatestPoemCard(context, _latestPoem!) else const Text('لا توجد قصائد منشورة بعد'),
-                          const SizedBox(height: 20),
-                          _sectionTitle('شعراء بارزون', actionLabel: 'عرض الكل', onAction: () => context.push('/poets')),
+                          if (_latestPoem != null)
+                            _buildLatestPoemCard(context, c, _latestPoem!)
+                          else
+                            Text('لا توجد قصائد منشورة بعد', style: TextStyle(color: c.textSecondary)),
+                          const SizedBox(height: 22),
+                          _sectionTitle(c, 'شعراء بارزون', actionLabel: 'عرض الكل', onAction: () => context.push('/poets')),
                           const SizedBox(height: 10),
-                          if (_poets.isNotEmpty) _buildPoetsRow(context) else const Text('لا يوجد شعراء منشورون بعد'),
+                          if (_poets.isNotEmpty)
+                            _buildPoetsRow(context, c)
+                          else
+                            Text('لا يوجد شعراء منشورون بعد', style: TextStyle(color: c.textSecondary)),
                         ],
                       ),
               ),
             ],
           ),
         ),
-        bottomNavigationBar: _buildBottomNav(),
+        bottomNavigationBar: _buildBottomNav(c),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      color: _kBrown,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: _kCream),
-            onPressed: () {},
+  // العنوان بلا شريط لوني صلب — عنوان مركزي على خلفية الصفحة نفسها،
+  // يحدّه خط ذهبي رفيع، اتساقًا مع طابع "المجلس" في بقية الشاشات.
+  Widget _buildHeader(BuildContext context, RawayaColors c) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+          child: Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.menu, color: c.textPrimary),
+                onPressed: () {},
+              ),
+              const Spacer(),
+              Text(
+                'موروث',
+                style: TextStyle(color: c.textPrimary, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: .3),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: Icon(Icons.notifications_none, color: c.textPrimary),
+                onPressed: () => context.go('/notifications'),
+              ),
+            ],
           ),
-          const Spacer(),
-          const Text(
-            'موروث',
-            style: TextStyle(
-              color: _kGold,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: _kCream),
-            onPressed: () => context.go('/notifications'),
-          ),
-        ],
-      ),
+        ),
+        const RawayaGoldDivider(),
+      ],
     );
   }
 
-  Widget _buildSearchField(BuildContext context) {
+  Widget _buildSearchField(BuildContext context, RawayaColors c) {
     return TextField(
       readOnly: true,
       onTap: () => context.go('/search'),
       textAlign: TextAlign.right,
+      style: TextStyle(color: c.textPrimary),
       decoration: InputDecoration(
         hintText: 'ابحث في موروث...',
-        prefixIcon: const Icon(Icons.search),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
-        ),
+        prefixIcon: Icon(Icons.search, color: c.textSecondary),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: c.border)),
       ),
     );
   }
 
-  Widget _buildHeroQuote() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Image.asset(
-        'assets/images/hero_bg.jpg',
-        height: 150,
-        width: double.infinity,
-        fit: BoxFit.cover,
+  Widget _buildHeroQuote(RawayaColors c) {
+    return Container(
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: c.border)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Image.asset('assets/images/hero_bg.jpg', height: 150, width: double.infinity, fit: BoxFit.cover),
       ),
     );
   }
 
-  Widget _sectionTitle(String title, {String? actionLabel, VoidCallback? onAction}) {
+  Widget _sectionTitle(RawayaColors c, String title, {String? actionLabel, VoidCallback? onAction}) {
     return Row(
       children: [
         if (actionLabel != null)
           TextButton(
             onPressed: onAction,
-            child: Text(actionLabel, style: const TextStyle(color: _kGold)),
+            child: Text(actionLabel, style: TextStyle(color: c.gold)),
           ),
         const Spacer(),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: _kBrown),
-        ),
+        Text(title, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: c.textPrimary)),
       ],
     );
   }
 
-  Widget _buildCategoriesRow(BuildContext context) {
+  Widget _buildCategoriesRow(BuildContext context, RawayaColors c) {
     return SizedBox(
       height: 108,
       child: ListView.separated(
@@ -211,20 +207,15 @@ class _HomePageState extends State<HomePage> {
               onTap: () => context.push(category.route),
               child: Column(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      category.image,
-                      width: 84,
-                      height: 78,
-                      fit: BoxFit.cover,
+                  Container(
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: c.border)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(11),
+                      child: Image.asset(category.image, width: 84, height: 78, fit: BoxFit.cover),
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    category.title,
-                    style: const TextStyle(fontSize: 13, color: _kBrown),
-                  ),
+                  Text(category.title, style: TextStyle(fontSize: 13, color: c.textPrimary)),
                 ],
               ),
             ),
@@ -234,23 +225,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildLatestPoemCard(BuildContext context, Map<String, dynamic> poem) {
+  Widget _buildLatestPoemCard(BuildContext context, RawayaColors c, Map<String, dynamic> poem) {
     final poetName = (poem['poet'] as Map?)?['fullName']?.toString();
     return GestureDetector(
       onTap: () => context.push('/poems/${poem['id']}'),
       child: Card(
-        elevation: 0,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(poem['title']?.toString() ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              Text(
+                poem['title']?.toString() ?? '',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: c.textPrimary),
+              ),
               if (poetName != null) ...[
                 const SizedBox(height: 4),
-                Text('للشاعر: $poetName', style: const TextStyle(fontSize: 13, color: Colors.black54)),
+                Text('للشاعر: $poetName', style: TextStyle(fontSize: 13, color: c.textSecondary)),
               ],
             ],
           ),
@@ -259,7 +250,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildPoetsRow(BuildContext context) {
+  Widget _buildPoetsRow(BuildContext context, RawayaColors c) {
     return SizedBox(
       height: 90,
       child: ListView.separated(
@@ -275,14 +266,18 @@ class _HomePageState extends State<HomePage> {
               onTap: () => context.push('/poets/${poet['id']}'),
               child: Column(
                 children: [
-                  const CircleAvatar(radius: 30, child: Icon(Icons.person_outline)),
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: c.surfaceAlt,
+                    child: Icon(Icons.person_outline, color: c.gold),
+                  ),
                   const SizedBox(height: 6),
                   Text(
                     poet['fullName']?.toString() ?? '',
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 11, color: _kBrown),
+                    style: TextStyle(fontSize: 11, color: c.textPrimary),
                   ),
                 ],
               ),
@@ -293,20 +288,25 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBottomNav() {
-    return BottomNavigationBar(
-      currentIndex: _navIndex,
-      onTap: _onNavTap,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: _kGold,
-      unselectedItemColor: Colors.black45,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'حسابي'),
-        BottomNavigationBarItem(icon: Icon(Icons.menu_book_outlined), label: 'المكتبة'),
-        BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'المفضلة'),
-        BottomNavigationBarItem(icon: Icon(Icons.grid_view_outlined), label: 'الأقسام'),
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'الرئيسية'),
-      ],
+  Widget _buildBottomNav(RawayaColors c) {
+    return Container(
+      decoration: BoxDecoration(color: c.surface, border: Border(top: BorderSide(color: c.border))),
+      child: BottomNavigationBar(
+        currentIndex: _navIndex,
+        onTap: _onNavTap,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        selectedItemColor: c.gold,
+        unselectedItemColor: c.textSecondary,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'حسابي'),
+          BottomNavigationBarItem(icon: Icon(Icons.menu_book_outlined), label: 'المكتبة'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'المفضلة'),
+          BottomNavigationBarItem(icon: Icon(Icons.grid_view_outlined), label: 'الأقسام'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'الرئيسية'),
+        ],
+      ),
     );
   }
 }

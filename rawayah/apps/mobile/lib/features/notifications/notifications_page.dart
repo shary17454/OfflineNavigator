@@ -44,7 +44,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('الإشعارات')),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -58,7 +58,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           final item = _items[index];
                           final isRead = item['isRead'] == true;
                           return ListTile(
-                            leading: Icon(isRead ? Icons.notifications_none : Icons.notifications_active, color: isRead ? Colors.grey : kGold),
+                            leading: Icon(isRead ? Icons.notifications_none : Icons.notifications_active, color: isRead ? Colors.grey : context.rawaya.gold),
                             title: Text(item['title']?.toString() ?? ''),
                             subtitle: Text(item['message']?.toString() ?? ''),
                             onTap: isRead ? null : () => _markRead(item['id'].toString(), index),

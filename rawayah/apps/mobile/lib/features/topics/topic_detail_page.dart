@@ -17,7 +17,7 @@ class TopicDetailPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(topic['title']?.toString() ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kBrown)),
+            Text(topic['title']?.toString() ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             const SizedBox(height: 12),
             if (topic['summary'] != null) Text(topic['summary'].toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
             if (topic['body'] != null) Text(topic['body'].toString(), style: const TextStyle(height: 1.8)),

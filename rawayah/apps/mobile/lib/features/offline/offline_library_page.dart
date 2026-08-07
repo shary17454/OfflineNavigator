@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/theme.dart';
 import 'offline_models.dart';
 
 class OfflineLibraryPage extends StatefulWidget {
@@ -360,8 +361,12 @@ class _OfflineChapterPageState extends State<OfflineChapterPage> {
       );
     }
 
-    final bg = _night ? const Color(0xFF0F1A1F) : const Color(0xFFFDF7ED);
-    final fg = _night ? const Color(0xFFE8EEF0) : const Color(0xFF1A1510);
+    // وضع القراءة الليلية هنا مستقل عمدًا عن ثيم التطبيق العام — يتيح
+    // للقارئ التبديل أثناء القراءة بصرف النظر عن وضع الجهاز، كتطبيقات
+    // القراءة المتخصصة. يستخدم نفس لوحة "المجلس" حتى يبقى متسقًا بصريًا.
+    final palette = _night ? RawayaColors.dark : RawayaColors.light;
+    final bg = palette.background;
+    final fg = palette.textPrimary;
 
     return Scaffold(
       backgroundColor: bg,

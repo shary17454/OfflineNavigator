@@ -17,7 +17,7 @@ class CamelDetailPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(camel['name']?.toString() ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kBrown)),
+            Text(camel['name']?.toString() ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             const SizedBox(height: 12),
             if (camel['summary'] != null) Text(camel['summary'].toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
             if (camel['description'] != null) Text(camel['description'].toString(), style: const TextStyle(height: 1.8)),

@@ -17,7 +17,7 @@ class BookDetailPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(book['title']?.toString() ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kBrown)),
+            Text(book['title']?.toString() ?? '', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
             const SizedBox(height: 8),
             if (book['author'] != null) Text('المؤلف: ${book['author']}'),
             if (book['editor'] != null) Text('المحقق: ${book['editor']}'),

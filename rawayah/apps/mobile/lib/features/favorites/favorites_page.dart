@@ -46,7 +46,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: kCream,
+        backgroundColor: context.rawaya.background,
         appBar: AppBar(title: const Text('المفضلة')),
         body: _loading
             ? const Center(child: CircularProgressIndicator())

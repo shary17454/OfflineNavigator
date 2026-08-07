@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'core/theme.dart';
 import 'features/home/home_page.dart';
 import 'features/search/search_page.dart';
 import 'features/auth/login_page.dart';
@@ -262,14 +263,15 @@ class RawayaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp.router(
       title: 'موروث',
       routerConfig: router,
-      theme: ThemeData(
-        fontFamily: 'Tajawal',
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFB68843)),
-        scaffoldBackgroundColor: const Color(0xFFFDF7ED),
-      ),
+      theme: rawayaLightTheme,
+      darkTheme: rawayaDarkTheme,
+      // النهاري/الليلي بالاختيار الصريح للمستخدم، أو حسب إعدادات الجهاز
+      // (system) افتراضيًا — تُقرأ من ThemeModeController المحفوظ محليًا.
+      themeMode: themeMode,
       locale: const Locale('ar', 'SA'),
       supportedLocales: const [Locale('ar', 'SA'), Locale('en', 'US')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
@@ -282,11 +284,29 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: FilledButton(
-          onPressed: () => context.goNamed('home'),
-          child: const Text('رواية… ذاكرة التراث العربي'),
+    final c = context.rawaya;
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'موروث',
+                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: c.textPrimary, letterSpacing: 1),
+              ),
+              const SizedBox(height: 10),
+              const RawayaGoldDivider(margin: EdgeInsets.symmetric(horizontal: 80)),
+              const SizedBox(height: 10),
+              Text('ذاكرة التراث العربي', style: TextStyle(color: c.textSecondary)),
+              const SizedBox(height: 32),
+              FilledButton(
+                onPressed: () => context.goNamed('home'),
+                child: const Text('ادخل'),
+              ),
+            ],
+          ),
         ),
       ),
     );
