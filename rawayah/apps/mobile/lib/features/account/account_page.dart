@@ -74,6 +74,33 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                       Text('البريد الإلكتروني: ${_me!['email']}'),
                       const SizedBox(height: 16),
                       OutlinedButton(onPressed: _logout, child: const Text('تسجيل الخروج')),
+
+                      const Divider(height: 32),
+                      const Text('العضوية المهنية', style: TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'الرواة والمؤرخون المعتمدون يمكنهم إضافة المواد، وتبقى كل مادة قيد مراجعة المالك قبل نشرها.',
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.badge_outlined, color: kGold),
+                        title: const Text('تقديم طلب عضوية (راوٍ / مؤرخ)'),
+                        onTap: () => context.push('/contributors/apply'),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.fact_check_outlined, color: kGold),
+                        title: const Text('مساهماتي وحالة مراجعتها'),
+                        onTap: () => context.push('/my-contributions'),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.privacy_tip_outlined, color: kGold),
+                        title: const Text('الشروط والسياسات'),
+                        onTap: () => context.push('/policies'),
+                      ),
+
                       const Divider(height: 32),
                       const Text('تصدير بياناتي', style: TextStyle(fontWeight: FontWeight.bold, color: kBrown)),
                       const SizedBox(height: 8),

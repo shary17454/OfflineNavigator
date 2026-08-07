@@ -26,6 +26,14 @@ class PoetDetailPage extends StatelessWidget {
             if (poet['region'] != null) Text('المنطقة: ${poet['region']}'),
             const SizedBox(height: 12),
             if (poet['biography'] != null) Text(poet['biography'].toString()),
+            const SizedBox(height: 16),
+            // مدخل مكتبة الشاعر: تجمع كل المواد المرتبطة به بكل أشكالها.
+            FilledButton.icon(
+              style: FilledButton.styleFrom(backgroundColor: kGold),
+              onPressed: () => context.push('/poets/$poetId/library'),
+              icon: const Icon(Icons.folder_special_outlined),
+              label: const Text('مكتبة الشاعر'),
+            ),
             const SizedBox(height: 20),
             const Text('قصائد الشاعر', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: kBrown)),
             const SizedBox(height: 8),

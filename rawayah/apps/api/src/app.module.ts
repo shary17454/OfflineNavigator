@@ -20,6 +20,9 @@ import { SourcesModule } from './modules/sources/sources.module';
 import { RightsModule } from './modules/rights/rights.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { PoetryModule } from './modules/poetry/poetry.module';
+import { ContributorsModule } from './modules/contributors/contributors.module';
+import { PoliciesModule } from './modules/policies/policies.module';
 
 @Module({
   imports: [
@@ -43,6 +46,9 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
     RightsModule,
     SettingsModule,
     AnalyticsModule,
+    PoetryModule,
+    ContributorsModule,
+    PoliciesModule,
   ],
 })
 export class AppModule {}

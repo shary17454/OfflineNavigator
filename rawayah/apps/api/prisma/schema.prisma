@@ -62,6 +62,91 @@ enum ContentType {
   SOURCE
   TOPIC
   ARTICLE
+  POET_FILE
+  POET_FILE_ITEM
+}
+
+// نوع العضوية المهنية التي يتقدّم لها المستخدم.
+enum ContributorType {
+  NARRATOR
+  HISTORIAN
+}
+
+enum ContributorApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  NEEDS_INFORMATION
+  APPROVED
+  REJECTED
+  SUSPENDED
+  REVOKED
+}
+
+// شكل المادة داخل مكتبة الشاعر.
+enum PoetFileItemKind {
+  TEXT
+  AUDIO
+  VIDEO
+  IMAGE
+  DOCUMENT
+  EXTERNAL_LINK
+}
+
+// أبعاد تصنيف الشعر. القصيدة الواحدة تحمل مصطلحًا من كل بُعد عند
+// الحاجة، وقد تحمل عدة أغراض (THEME) في آنٍ واحد — لذلك التصنيف
+// علاقة متعدد-إلى-متعدد لا حقل واحد على القصيدة.
+enum PoetryTaxonomyDimension {
+  TRADITION
+  ERA
+  THEME
+  REGION
+  PERFORMANCE
+  COLLECTION
+}
+
+// سير مراجعة مساهمات الرواة والمؤرخين.
+enum ContributionReviewState {
+  DRAFT
+  SUBMITTED
+  OWNER_REVIEW
+  CHANGES_REQUESTED
+  APPROVED
+  PUBLISHED
+  REJECTED
+}
+
+// وثائق السياسات القابلة للتحرير من لوحة المالك.
+enum PolicyDocumentCode {
+  TERMS_OF_SERVICE
+  PRIVACY_POLICY
+  CONTENT_POLICY
+  CONTRIBUTOR_AGREEMENT
+  COPYRIGHT_POLICY
+  TAKEDOWN_POLICY
+  SOURCE_POLICY
+  ORAL_HISTORY_POLICY
+  COMMUNITY_GUIDELINES
+}
+
+// نوع الموافقة الصريحة المسجَّلة على المستخدم.
+enum ConsentType {
+  NARRATOR_PUBLIC_PROFILE
+  HISTORIAN_PUBLIC_PROFILE
+  CONTRIBUTOR_AGREEMENT
+  POLICY_ACCEPTANCE
+}
+
+// دقة التاريخ التراثي — كثير من تواريخ الشعراء تقريبية أو مختلف فيها،
+// ولا يجوز عرض تاريخ ظني كأنه مؤكد.
+enum DatePrecision {
+  EXACT
+  YEAR
+  DECADE
+  CENTURY
+  APPROXIMATE
+  DISPUTED
+  UNKNOWN
 }
 
 enum RightsStatus {
@@ -203,6 +288,14 @@ model User {
   rightsRecords        RightsRecord[]
   publishedBatches     PublishingBatch[] @relation("PublishingBatchPublishedBy")
   rolledBackBatches    PublishingBatch[] @relation("PublishingBatchRolledBackBy")
+
+  contributorApplications ContributorApplication[] @relation("ContributorApplicationUser")
+  reviewedContributorApplications ContributorApplication[] @relation("ContributorApplicationReviewedBy")
+  contributedPoetFileItems PoetFileItem[] @relation("PoetFileItemContributedBy")
+  reviewedPoetFileItems    PoetFileItem[] @relation("PoetFileItemReviewedBy")
+  publishedPoetFileItems   PoetFileItem[] @relation("PoetFileItemPublishedBy")
+  consentRecords           ConsentRecord[] @relation("ConsentRecordUser")
+  policyAcceptances        PolicyAcceptance[] @relation("PolicyAcceptanceUser")
 }
 
 model Profile {
@@ -288,9 +381,22 @@ model Poet {
   reviewedBy    String?
   publishedBy   String?
 
+  // كنية الشاعر ولقبه. طرق كتابة الاسم الأخرى تُخزَّن في NameVariant
+  // (contentType = POET) بدل تكرار حقول نصية هنا.
+  kunya         String?
+  laqab         String?
+  // دقة تاريخي الميلاد والوفاة — تمنع عرض تاريخ ظني كأنه مؤكد.
+  birthDatePrecision DatePrecision @default(UNKNOWN)
+  deathDatePrecision DatePrecision @default(UNKNOWN)
+  // ملاحظة تُعرض للقارئ عند اختلاف المصادر حول التواريخ أو النسب.
+  disputeNote   String?
+  lastReviewedAt DateTime?
+  lastReviewedBy String?
+
   poems         Poem[]
   stories       Story[]
   attributions  PoemAttribution[]
+  file          PoetFile?
   @@index([fullName])
 }
 
@@ -329,6 +435,8 @@ model Poem {
   poet          Poet @relation(fields: [poetId], references: [id], onDelete: Cascade)
   versions      PoemVersion[]
   attributions  PoemAttribution[]
+  poetFileItems PoetFileItem[]
+  taxonomies    PoemTaxonomy[]
 }
 
 model Story {
@@ -706,6 +814,7 @@ model Source {
   contentSuggestions ContentSuggestion[]
   lineageAsSource SourceLineage[] @relation("SourceLineageSource")
   lineageAsParent SourceLineage[] @relation("SourceLineageParent")
+  poetFileItems  PoetFileItem[]
 }
 
 model ContentSource {
@@ -1522,4 +1631,236 @@ model PublishingBatch {
   publishedBy  User @relation("PublishingBatchPublishedBy", fields: [publishedById], references: [id], onDelete: Cascade)
   rolledBackBy User? @relation("PublishingBatchRolledBackBy", fields: [rolledBackById], references: [id], onDelete: SetNull)
   records      IngestionRecord[]
+}
+
+// =========================================================
+// تصنيف الشعر متعدد الأبعاد، مكتبة الشاعر، العضويات المهنية،
+// الموافقات الصريحة، ووثائق السياسات.
+// =========================================================
+
+// مصطلح تصنيفي للشعر ضمن بُعد محدد (تقليد/عصر/غرض/منطقة/أداء/مجموعة).
+// جدول لا enum: المالك يضيف ويعدّل ويرتّب ويخفي ويُنشئ تصنيفات فرعية
+// دون تعديل المخطط أو إصدار نسخة جديدة من التطبيق.
+model PoetryTaxonomyTerm {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  nameAr      String
+  description String?
+  dimension   PoetryTaxonomyDimension
+  parentId    String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  // عند دمج تصنيفين يبقى القديم مع إشارة إلى الجديد بدل حذفه،
+  // حتى لا تنكسر الروابط أو المرجعيات الخارجية.
+  mergedIntoId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent     PoetryTaxonomyTerm?  @relation("PoetryTaxonomyParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children   PoetryTaxonomyTerm[] @relation("PoetryTaxonomyParent")
+  mergedInto PoetryTaxonomyTerm?  @relation("PoetryTaxonomyMerge", fields: [mergedIntoId], references: [id], onDelete: SetNull)
+  mergedFrom PoetryTaxonomyTerm[] @relation("PoetryTaxonomyMerge")
+  poems      PoemTaxonomy[]
+
+  @@index([dimension, isActive])
+  @@index([parentId])
+}
+
+// ربط القصيدة بمصطلح تصنيفي. متعدد-إلى-متعدد لأن القصيدة قد تكون
+// نبطية + في الغزل + من منطقة + من عصر معيّن في آنٍ واحد.
+model PoemTaxonomy {
+  id        String   @id @default(cuid())
+  poemId    String
+  termId    String
+  createdAt DateTime @default(now())
+
+  poem Poem               @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  term PoetryTaxonomyTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  @@unique([poemId, termId])
+  @@index([termId])
+}
+
+// مكتبة الشاعر: حاوية واحدة لكل شاعر تجمع كل المواد المرتبطة به.
+model PoetFile {
+  id          String   @id @default(cuid())
+  poetId      String   @unique
+  overview    String?
+  status      ContentStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdBy   String?
+  publishedBy String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  poet  Poet @relation(fields: [poetId], references: [id], onDelete: Cascade)
+  items PoetFileItem[]
+}
+
+// مادة داخل مكتبة الشاعر. الحقول المستخدمة تعتمد على kind:
+// TEXT يستخدم bodyText، EXTERNAL_LINK يستخدم externalUrl،
+// وبقية الأنواع تستخدم mediaUrl.
+//
+// بوابة الحقوق: لا يجوز نشر AUDIO/VIDEO/IMAGE/DOCUMENT ما لم تكن
+// rightsStatus من الحالات المسموح بها وallowDisplay = true.
+// هذا مفروض في الخدمة لا في الواجهة فقط.
+model PoetFileItem {
+  id           String   @id @default(cuid())
+  poetFileId   String
+  kind         PoetFileItemKind
+  title        String
+  description  String?
+  bodyText     String?
+  mediaUrl     String?
+  externalUrl  String?
+  mediaFileId  String?
+  poemId       String?
+  durationMs   Int?
+
+  occasion     String?
+  materialDate String?
+  materialDatePrecision DatePrecision @default(UNKNOWN)
+  reciterName  String?
+  capturedByName String?
+  sourceId     String?
+  sourceNotes  String?
+
+  rightsHolder String?
+  rightsStatus RightsStatus @default(UNKNOWN)
+  licenseName  String?
+  allowDisplay    Boolean @default(false)
+  allowDownload   Boolean @default(false)
+  allowCommercial Boolean @default(false)
+
+  documentationLevel VerificationLevel @default(UNDER_REVIEW)
+  internalNotes String?
+  reviewState  ContributionReviewState @default(DRAFT)
+  status       ContentStatus @default(DRAFT)
+  sortOrder    Int      @default(0)
+
+  contributedById String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  reviewNotes  String?
+  publishedById String?
+  publishedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  poetFile      PoetFile @relation(fields: [poetFileId], references: [id], onDelete: Cascade)
+  poem          Poem? @relation(fields: [poemId], references: [id], onDelete: SetNull)
+  source        Source? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  contributedBy User? @relation("PoetFileItemContributedBy", fields: [contributedById], references: [id], onDelete: SetNull)
+  reviewedBy    User? @relation("PoetFileItemReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  publishedBy   User? @relation("PoetFileItemPublishedBy", fields: [publishedById], references: [id], onDelete: SetNull)
+
+  @@index([poetFileId, status])
+  @@index([kind])
+  @@index([reviewState])
+}
+
+// طلب عضوية مهنية (راوٍ أو مؤرخ).
+//
+// فصل صريح بين البيانات العامة والبيانات الخاصة:
+// حقول public* هي وحدها القابلة للعرض للعامة بعد القبول.
+// حقول التحقق (الهاتف، وسيلة التواصل، الإثباتات) خاصة دائمًا
+// ولا تُعاد في أي نقطة API عامة مهما كانت حالة الطلب.
+model ContributorApplication {
+  id     String @id @default(cuid())
+  userId String
+  type   ContributorType
+
+  // ---- بيانات عامة (تُعرض بعد القبول والموافقة الصريحة) ----
+  publicDisplayName String
+  publicBio         String
+  publicSpecialties String
+  publicAvatarUrl   String?
+  publicCountry     String?
+  publicRegion      String?
+
+  // ---- بيانات خاصة للتحقق فقط — لا تُعرض للعامة إطلاقًا ----
+  privateFullName        String
+  privateEmail           String
+  privatePhoneNumber     String?
+  privatePreferredContact String?
+  privateExperience      String
+  privateKnowledgeSources String?
+  privateReliesOnOralTradition Boolean @default(false)
+  privateHasRecordings   Boolean @default(false)
+  privateHasDocuments    Boolean @default(false)
+  privateCredentials     String?
+  privatePublications    String?
+  privateProfessionalLinks String?
+  privateVerificationNotes String?
+  privateSampleWorkUrl   String?
+
+  status       ContributorApplicationStatus @default(DRAFT)
+  submittedAt  DateTime?
+  reviewedById String?
+  reviewedAt   DateTime?
+  reviewNotes  String?
+  infoRequestedNote String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User @relation("ContributorApplicationUser", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User? @relation("ContributorApplicationReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@unique([userId, type])
+  @@index([status])
+}
+
+// سجل موافقة صريحة. يحفظ نص الموافقة كما عُرض وقت القبول
+// (لا مجرد إشارة إليه) حتى يمكن إثبات ما وافق عليه المستخدم فعلًا
+// حتى لو تغيّر نص السياسة لاحقًا.
+model ConsentRecord {
+  id            String @id @default(cuid())
+  userId        String
+  consentType   ConsentType
+  documentVersion String
+  consentText   String
+  // البيانات التي وافق صراحةً على نشرها، كمصفوفة مفاتيح.
+  grantedScopes Json?
+  grantedAt     DateTime @default(now())
+  withdrawnAt   DateTime?
+  withdrawnNote String?
+  createdAt     DateTime @default(now())
+
+  user User @relation("ConsentRecordUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, consentType])
+}
+
+// وثيقة سياسة قابلة للتحرير من لوحة المالك، مع حفظ كل إصدار
+// وتاريخ سريانه بدل الكتابة فوق النص السابق.
+model PolicyDocument {
+  id            String @id @default(cuid())
+  code          PolicyDocumentCode
+  version       String
+  titleAr       String
+  bodyAr        String
+  effectiveFrom DateTime @default(now())
+  isCurrent     Boolean  @default(false)
+  // يُطلب قبول جديد من المستخدمين عند تغيير جوهري.
+  requiresReacceptance Boolean @default(false)
+  createdById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  acceptances PolicyAcceptance[]
+
+  @@unique([code, version])
+  @@index([code, isCurrent])
+}
+
+model PolicyAcceptance {
+  id         String @id @default(cuid())
+  userId     String
+  documentId String
+  acceptedAt DateTime @default(now())
+
+  user     User           @relation("PolicyAcceptanceUser", fields: [userId], references: [id], onDelete: Cascade)
+  document PolicyDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, documentId])
 }

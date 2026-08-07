@@ -8,6 +8,9 @@ export default function AdminHome() {
         <h2>المراجعات العاجلة</h2>
         <Link href="/users">المستخدمون</Link> |
         <Link href="/content">المحتوى</Link> |
+        <Link href="/poetry-taxonomy">تصنيفات الشعر</Link> |
+        <Link href="/poet-library-review">مراجعة مواد الشعراء</Link> |
+        <Link href="/contributors">طلبات العضوية</Link> |
         <Link href="/ingestion">الاستيراد والمراجعة</Link> |
         <Link href="/suggestions">اقتراحات المستخدمين</Link> |
         <Link href="/sources">المصادر</Link> |

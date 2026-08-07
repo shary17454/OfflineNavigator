@@ -16,7 +16,8 @@ const _kGold = Color(0xFFB68843);
 const _kCream = Color(0xFFFDF7ED);
 
 const _kCategories = [
-  HeritageCategory(title: 'الشعر', image: 'assets/images/cat_poetry.jpg', route: '/poems'),
+  // «الشعر» تفتح أقسام الشعر (التصنيفات) لا قائمة القصائد المسطحة.
+  HeritageCategory(title: 'الشعر', image: 'assets/images/cat_poetry.jpg', route: '/poetry'),
   HeritageCategory(title: 'القصص', image: 'assets/images/cat_stories.jpg', route: '/stories'),
   HeritageCategory(title: 'الخيل', image: 'assets/images/cat_horses.jpg', route: '/horses'),
   HeritageCategory(title: 'الإبل', image: 'assets/images/cat_camels.jpg', route: '/camels'),

@@ -32,6 +32,11 @@ import 'features/account/account_page.dart';
 import 'features/account/settings_page.dart';
 import 'features/notifications/notifications_page.dart';
 import 'features/static/static_pages.dart';
+import 'features/static/policies_page.dart';
+import 'features/poetry/poetry_sections_page.dart';
+import 'features/poetry/poet_library_page.dart';
+import 'features/contributors/contributor_apply_page.dart';
+import 'features/contributors/my_contributions_page.dart';
 import 'features/horses/horses_page.dart';
 import 'features/horses/horse_detail_page.dart';
 import 'features/camels/camels_page.dart';
@@ -95,10 +100,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/contact', name: 'contact', builder: (context, state) => const ContactPage()),
 
       GoRoute(
+        path: '/poetry',
+        name: 'poetry',
+        builder: (context, state) => const PoetrySectionsPage(),
+        routes: [
+          GoRoute(path: ':slug', builder: (context, state) => PoetryTermPage(slug: state.pathParameters['slug']!)),
+        ],
+      ),
+      GoRoute(
         path: '/poets',
         name: 'poets',
         builder: (context, state) => const PoetsPage(),
-        routes: [GoRoute(path: ':id', builder: (context, state) => PoetDetailPage(poetId: state.pathParameters['id']!))],
+        routes: [
+          GoRoute(path: ':id', builder: (context, state) => PoetDetailPage(poetId: state.pathParameters['id']!)),
+          GoRoute(
+            path: ':id/library',
+            builder: (context, state) => PoetLibraryPage(poetId: state.pathParameters['id']!),
+          ),
+        ],
       ),
       GoRoute(
         path: '/poems',
@@ -174,6 +193,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'hunting-dogs',
         builder: (context, state) => const HuntingDogsPage(),
         routes: [GoRoute(path: ':id', builder: (context, state) => HuntingDogDetailPage(breedId: state.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/policies',
+        name: 'policies',
+        builder: (context, state) => const PoliciesListPage(),
+        routes: [
+          GoRoute(path: ':code', builder: (context, state) => PolicyDetailPage(code: state.pathParameters['code']!)),
+        ],
+      ),
+      GoRoute(
+        path: '/contributors/apply',
+        name: 'contributor-apply',
+        builder: (context, state) => const ContributorApplyPage(),
+      ),
+      GoRoute(
+        path: '/my-contributions',
+        name: 'my-contributions',
+        builder: (context, state) => const MyContributionsPage(),
       ),
       GoRoute(path: '/reading-lists', name: 'reading-lists', builder: (context, state) => const ReadingListsPage()),
       GoRoute(path: '/media', name: 'media', builder: (context, state) => const MediaPage()),
