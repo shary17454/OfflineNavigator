@@ -2,6 +2,7 @@ import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { PoetryService } from '../src/modules/poetry/poetry.service';
 import { PrismaService } from '../src/shared/prisma/prisma.service';
+import { StorageService } from '../src/shared/media/storage.service';
 
 // اختبارات تثبّت الحواجز التي تحمي المالك قانونيًا ومحتوائيًا:
 // بوابة الحقوق قبل نشر الوسائط، ومنع المساهم من تجاوز المراجعة،
@@ -20,7 +21,11 @@ describe('PoetryService — بوابة الحقوق وسلامة التصنيف�
       $transaction: jest.fn(),
     };
     const moduleRef = await Test.createTestingModule({
-      providers: [PoetryService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        PoetryService,
+        { provide: PrismaService, useValue: prisma },
+        { provide: StorageService, useValue: { save: jest.fn() } },
+      ],
     }).compile();
     service = moduleRef.get(PoetryService);
   });

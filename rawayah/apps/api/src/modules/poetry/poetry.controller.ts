@@ -1,5 +1,18 @@
-import { Body, Controller, Get, Param, Post, Patch, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Patch,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../shared/common/current-user.decorator';
 import { JwtAuthGuard } from '../../shared/common/jwt-auth.guard';
 import { PermissionGuard } from '../../shared/common/roles.guard';
@@ -120,6 +133,23 @@ export class PoetryController {
   @Permissions('poet_file:contribute')
   addItem(@Param('id') id: string, @Body() dto: CreatePoetFileItemDto, @CurrentUser() user: any) {
     return this.svc.addPoetFileItem(id, dto, user.id);
+  }
+
+  // رفع ملف المادة قبل إنشائها. يعيد mediaUrl لاستخدامه في نقطة الإضافة.
+  @Post('poets/:id/library/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @ApiBearerAuth()
+  @Permissions('poet_file:contribute')
+  uploadMedia(
+    @Param('id') id: string,
+    @UploadedFile() file: { buffer: Buffer; originalname: string; mimetype: string },
+    @Body('kind') kind: string,
+    @CurrentUser() user: any,
+  ) {
+    if (!file) throw new BadRequestException('الملف مطلوب');
+    return this.svc.uploadPoetFileMedia(id, kind, file, user.id);
   }
 
   @Post('poetry/items/:itemId/submit')

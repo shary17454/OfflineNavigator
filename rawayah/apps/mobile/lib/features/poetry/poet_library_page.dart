@@ -7,9 +7,13 @@ import '../../core/theme.dart';
 /// مكتبة الشاعر: تبويبات تُبنى من استجابة الخادم، والتبويب الفارغ
 /// لا يظهر إطلاقًا لأن الخادم نفسه لا يعيده.
 class PoetLibraryPage extends StatefulWidget {
-  const PoetLibraryPage({super.key, required this.poetId});
+  const PoetLibraryPage({super.key, required this.poetId, this.initialTab});
 
   final String poetId;
+
+  /// مفتاح التبويب المطلوب فتحه مباشرة (مثل `narrations`) — يتيح الربط
+  /// العميق إلى تبويب بعينه بدل فتح الأول دائمًا.
+  final String? initialTab;
 
   @override
   State<PoetLibraryPage> createState() => _PoetLibraryPageState();
@@ -19,6 +23,7 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
   Map<String, dynamic>? _data;
   bool _loading = true;
   String? _error;
+  bool _canContribute = false;
 
   @override
   void initState() {
@@ -32,9 +37,19 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
       _data = res.data;
     } catch (_) {
       _error = 'تعذّر تحميل مكتبة الشاعر';
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
+
+    // زر الإضافة يظهر فقط لمن يملك صلاحية المساهمة فعليًا. نجاح هذه النقطة
+    // هو الدليل — لا نخمّن الدور من الواجهة. وحتى لو ظهر الزر خطأً فالخادم
+    // يرفض الإضافة بـ403، فالإخفاء تحسين تجربة لا حاجز أمني.
+    try {
+      await ApiClient().get<List<dynamic>>('/poetry/my-contributions');
+      _canContribute = true;
+    } catch (_) {
+      _canContribute = false;
+    }
+
+    if (mounted) setState(() => _loading = false);
   }
 
   // عرض التاريخ مع دقته — لا يُعرض تاريخ ظني كأنه مؤكد.
@@ -78,10 +93,15 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
     final poet = (_data!['poet'] as Map).cast<String, dynamic>();
     final tabs = ((_data!['tabs'] as List?) ?? []).cast<Map<String, dynamic>>();
 
+    final initialIndex = widget.initialTab == null
+        ? 0
+        : tabs.indexWhere((t) => t['key'] == widget.initialTab).clamp(0, tabs.isEmpty ? 0 : tabs.length - 1);
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: DefaultTabController(
         length: tabs.length,
+        initialIndex: initialIndex,
         child: Scaffold(
           backgroundColor: kCream,
           appBar: AppBar(
@@ -93,6 +113,17 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
                     tabs: [for (final t in tabs) Tab(text: '${t['label']} (${t['count']})')],
                   ),
           ),
+          floatingActionButton: _canContribute
+              ? FloatingActionButton.extended(
+                  backgroundColor: kGold,
+                  onPressed: () async {
+                    await context.push('/poets/${widget.poetId}/library/add');
+                    if (mounted) _load();
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('إضافة مادة'),
+                )
+              : null,
           body: tabs.isEmpty
               ? const Center(child: Text('لا توجد مواد منشورة لهذا الشاعر بعد'))
               : TabBarView(
@@ -121,6 +152,8 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
         return _mediaTab('links', Icons.link_outlined);
       case 'stories':
         return _storiesTab();
+      case 'narrations':
+        return _narrationsTab();
       case 'sources':
         return _sourcesTab();
       default:
@@ -281,6 +314,99 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
         onTap: () => context.push('/stories/${stories[i]['id']}'),
       ),
     );
+  }
+
+  // اختلاف الروايات: تُعرض كل الروايات معًا لنفس الموضوع مع نقاط الاختلاف
+  // ومستوى التوثيق والمصدر — بلا ترجيح رواية على أخرى.
+  Widget _narrationsTab() {
+    final groups = ((_data!['narrationGroups'] as List?) ?? []).cast<Map<String, dynamic>>();
+    if (groups.isEmpty) return const Center(child: Text('لا توجد روايات مختلفة موثّقة'));
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(12),
+      itemCount: groups.length,
+      itemBuilder: (context, index) {
+        final group = groups[index];
+        final narrations = ((group['narrations'] as List?) ?? []).cast<Map<String, dynamic>>();
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  group['subjectTitle']?.toString() ?? '',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: kBrown, fontSize: 16),
+                ),
+                Text(
+                  'وردت ${narrations.length} روايات مختلفة',
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF6E0),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    'تُعرض الروايات كما وردت دون ترجيح إحداها، فالمسألة محل اختلاف بين المصادر.',
+                    style: TextStyle(fontSize: 12, color: kBrown),
+                  ),
+                ),
+                for (final n in narrations) ...[
+                  const Divider(),
+                  Text(
+                    n['label']?.toString() ?? 'رواية',
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: kGold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(n['body']?.toString() ?? '', style: const TextStyle(height: 1.8)),
+                  if (n['differenceNote'] != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        'موضع الاختلاف: ${n['differenceNote']}',
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF8D6E00)),
+                      ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      [
+                        if (n['source'] != null) 'المصدر: ${(n['source'] as Map)['title']}',
+                        'مستوى التوثيق: ${_verificationLabel(n['verificationLevel']?.toString())}',
+                      ].join(' • '),
+                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _verificationLabel(String? level) {
+    switch (level) {
+      case 'VERIFIED':
+        return 'موثّقة';
+      case 'PARTIAL':
+        return 'موثّقة جزئيًا';
+      case 'ORAL':
+        return 'رواية شفهية';
+      case 'DISPUTED':
+        return 'محل خلاف';
+      case 'INCOMPLETE':
+        return 'ناقصة';
+      default:
+        return 'قيد المراجعة';
+    }
   }
 
   Widget _sourcesTab() {

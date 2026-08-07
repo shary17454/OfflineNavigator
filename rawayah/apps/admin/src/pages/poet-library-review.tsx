@@ -20,6 +20,7 @@ type Item = {
   reviewState: string;
   poetFile?: { poet?: { id: string; fullName: string } };
   contributedBy?: { id: string; email: string; profile?: { displayName?: string } };
+  checks?: Array<{ type: string; severity: 'info' | 'warning'; message: string }>;
 };
 
 const MEDIA_KINDS = ['AUDIO', 'VIDEO', 'IMAGE', 'DOCUMENT'];
@@ -135,6 +136,19 @@ export default function PoetLibraryReview() {
             {item.reciterName && <p>الراوي/الملقي: {item.reciterName}</p>}
             {item.occasion && <p>المناسبة: {item.occasion}</p>}
             {item.sourceNotes && <p>ملاحظات المصدر: {item.sourceNotes}</p>}
+
+            {item.checks && item.checks.length > 0 && (
+              <div style={{ background: '#f5f5f5', padding: 12, margin: '12px 0', borderRight: '4px solid #999' }}>
+                <strong>تنبيهات آلية (للمساعدة فقط — القرار لك):</strong>
+                <ul style={{ margin: '8px 0 0' }}>
+                  {item.checks.map((check, i) => (
+                    <li key={i} style={{ color: check.severity === 'warning' ? '#b71c1c' : '#555' }}>
+                      {check.message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div style={{ background: '#fff8e6', padding: 12, margin: '12px 0' }}>
               <strong>الحقوق:</strong> {RIGHTS_LABELS[item.rightsStatus] || item.rightsStatus}

@@ -35,6 +35,7 @@ import 'features/static/static_pages.dart';
 import 'features/static/policies_page.dart';
 import 'features/poetry/poetry_sections_page.dart';
 import 'features/poetry/poet_library_page.dart';
+import 'features/poetry/add_poet_material_page.dart';
 import 'features/contributors/contributor_apply_page.dart';
 import 'features/contributors/my_contributions_page.dart';
 import 'features/horses/horses_page.dart';
@@ -115,7 +116,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: ':id', builder: (context, state) => PoetDetailPage(poetId: state.pathParameters['id']!)),
           GoRoute(
             path: ':id/library',
-            builder: (context, state) => PoetLibraryPage(poetId: state.pathParameters['id']!),
+            builder: (context, state) => PoetLibraryPage(
+              poetId: state.pathParameters['id']!,
+              initialTab: state.uri.queryParameters['tab'],
+            ),
+          ),
+          GoRoute(
+            path: ':id/library/add',
+            builder: (context, state) => AddPoetMaterialPage(poetId: state.pathParameters['id']!),
           ),
         ],
       ),
