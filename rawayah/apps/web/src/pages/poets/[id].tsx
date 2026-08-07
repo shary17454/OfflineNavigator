@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useState } from 'react';
+import type { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { get } from '../../lib/http';
+import { Seo } from '../../components/ContentPage';
+import { ssrGet } from '../../lib/ssr';
 
 type Item = {
   id: string;
@@ -68,25 +69,19 @@ function formatDate(date?: string | null, precision?: string | null) {
 
 /// مكتبة الشاعر في الموقع العام. التبويبات تأتي من الخادم، والفارغ منها
 /// لا يُعاد أصلًا فلا يُعرض هنا.
-export default function PoetLibraryPage() {
-  const router = useRouter();
-  const { id } = router.query;
-  const [data, setData] = useState<LibraryPayload | null>(null);
-  const [error, setError] = useState(false);
-  const [tab, setTab] = useState<string>('overview');
+export default function PoetLibraryPage({
+  data,
+  failed,
+}: {
+  data: LibraryPayload | null;
+  failed: boolean;
+}) {
+  // التبويب حالة تفاعلية محلية، أما المحتوى نفسه فيصل مُصيَّرًا من الخادم
+  // — كل التبويبات موجودة في HTML الأولي فيفهرسها محرك البحث كاملة.
+  const [tab, setTab] = useState<string>(data?.tabs[0]?.key ?? 'overview');
 
-  useEffect(() => {
-    if (!id || typeof id !== 'string') return;
-    get<LibraryPayload>(`/poets/${id}/library`)
-      .then((payload) => {
-        setData(payload);
-        if (payload.tabs.length > 0) setTab(payload.tabs[0].key);
-      })
-      .catch(() => setError(true));
-  }, [id]);
-
-  if (error) return <main className="home"><p>الشاعر غير موجود أو غير منشور.</p></main>;
-  if (!data) return <main className="home"><p>جارٍ التحميل…</p></main>;
+  if (failed) return <main className="home"><p role="alert">تعذّر الاتصال بالخادم. أعد المحاولة بعد قليل.</p></main>;
+  if (!data) return <main className="home"><p>الشاعر غير موجود أو غير منشور.</p></main>;
 
   const poet = data.poet;
   const birth = formatDate(poet.birthDate, poet.birthDatePrecision);
@@ -118,6 +113,11 @@ export default function PoetLibraryPage() {
 
   return (
     <main className="home">
+      <Seo
+        title={poet.fullName ?? 'مكتبة الشاعر'}
+        description={(data.overview || poet.biography || `مكتبة الشاعر ${poet.fullName ?? ''} في موروث`).slice(0, 160)}
+        path={`/poets/${poet.id}`}
+      />
       <p><Link href="/poets">← الشعراء</Link></p>
       <h1>{poet.fullName}</h1>
 
@@ -236,3 +236,8 @@ export default function PoetLibraryPage() {
     </main>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { data, failed } = await ssrGet<LibraryPayload>(`/poets/${String(ctx.params?.id ?? '')}/library`);
+  return { props: { data: data ?? null, failed } };
+};

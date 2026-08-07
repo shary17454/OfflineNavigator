@@ -32,7 +32,10 @@ export async function ssrGet<T>(path: string, timeoutMs = 8000): Promise<SsrResu
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
     });
-    if (!res.ok) return { data: null, failed: true };
+    // 4xx تعني "المادة غير موجودة أو غير منشورة" — حالة طبيعية تُعرض
+    // برسالتها، لا عطل خادم. حصر `failed` في 5xx وأخطاء الشبكة هو ما
+    // يجعل رسالة "تعذّر الاتصال" صادقة عند ظهورها.
+    if (!res.ok) return { data: null, failed: res.status >= 500 };
     return { data: (await res.json()) as T, failed: false };
   } catch {
     return { data: null, failed: true };
