@@ -327,6 +327,10 @@ export class PoetryService {
         })
       : [];
 
+    // المادة هنا PUBLISHED فعلًا (حقوقها كُشفت في بوابة النشر)، فتُستخدم
+    // مدة الصلاحية العامة الأطول لا الخاصة القصيرة.
+    const itemsWithResolvedMedia = await this.resolveItemsMediaUrls(items, false);
+
     const poems = await this.prisma.poem.findMany({
       where: { poetId, status: 'PUBLISHED', deletedAt: null },
       select: { id: true, slug: true, title: true, summary: true },
@@ -403,12 +407,12 @@ export class PoetryService {
       if (count > 0) tabs.push({ key, label, count });
     };
 
-    const audios = items.filter((i) => i.kind === 'AUDIO');
-    const videos = items.filter((i) => i.kind === 'VIDEO');
-    const images = items.filter((i) => i.kind === 'IMAGE');
-    const documents = items.filter((i) => i.kind === 'DOCUMENT');
-    const links = items.filter((i) => i.kind === 'EXTERNAL_LINK');
-    const texts = items.filter((i) => i.kind === 'TEXT');
+    const audios = itemsWithResolvedMedia.filter((i) => i.kind === 'AUDIO');
+    const videos = itemsWithResolvedMedia.filter((i) => i.kind === 'VIDEO');
+    const images = itemsWithResolvedMedia.filter((i) => i.kind === 'IMAGE');
+    const documents = itemsWithResolvedMedia.filter((i) => i.kind === 'DOCUMENT');
+    const links = itemsWithResolvedMedia.filter((i) => i.kind === 'EXTERNAL_LINK');
+    const texts = itemsWithResolvedMedia.filter((i) => i.kind === 'TEXT');
 
     add('overview', 'نبذة', poet.biography || poet.summary || file?.overview ? 1 : 0);
     add('poems', 'القصائد', poems.length + texts.length);
@@ -455,7 +459,10 @@ export class PoetryService {
       },
     });
     if (!file) throw new NotFoundException('لا توجد مكتبة لهذا الشاعر بعد');
-    return file;
+
+    // مواد قيد المراجعة تحديدًا (حقوقها غير محسومة بعد) — تُعامل كخاصة
+    // مطابقةً لحالتها الفعلية وقت الرفع.
+    return { ...file, items: await this.resolveItemsMediaUrls(file.items, true) };
   }
 
   // إضافة مادة. يستخدمها المالك والمساهم المعتمد معًا، والفرق أن
@@ -626,7 +633,33 @@ export class PoetryService {
       },
     });
 
-    return Promise.all(items.map(async (item) => ({ ...item, checks: await this.runChecks(item) })));
+    const withChecks = await Promise.all(
+      items.map(async (item) => ({ ...item, checks: await this.runChecks(item) })),
+    );
+    // مواد قيد المراجعة أيضًا — لم تُنشر بعد، فتُعامل كخاصة.
+    return this.resolveItemsMediaUrls(withChecks, true);
+  }
+
+  // mediaUrl المخزَّن في قاعدة البيانات هو مفتاح التخزين (storageKey) لا
+  // رابطًا قابلاً للعرض مباشرة — لا يُخزَّن رابط ثابت لأنه ينتهي، بل
+  // يُحسب رابط موقَّع جديد عند كل قراءة (نفس نمط MediaService الموجود).
+  // isPrivate يحدد مدة الصلاحية فقط (15 دقيقة/24 ساعة) لا إمكانية
+  // الوصول نفسها، لأن الروابط الموقَّعة لا تعتمد على ACL علني للحاوية.
+  private async resolveItemsMediaUrls<T extends { kind: string; mediaUrl?: string | null }>(
+    items: T[],
+    isPrivate: boolean,
+  ): Promise<T[]> {
+    return Promise.all(
+      items.map(async (item) => {
+        if (!MEDIA_KINDS.includes(item.kind) || !item.mediaUrl) return item;
+        try {
+          return { ...item, mediaUrl: await this.storage.getSignedDownloadUrl(item.mediaUrl, isPrivate) };
+        } catch {
+          // ملف مفقود أو تعذّر التوقيع — تُعرض المادة بلا رابط بدل كسر الصفحة كاملة.
+          return { ...item, mediaUrl: null };
+        }
+      }),
+    );
   }
 
   // فحوصات مساعدة على مادة واحدة.
