@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'core/media_playback.dart';
 import 'core/theme.dart';
 import 'features/home/home_page.dart';
 import 'features/search/search_page.dart';
@@ -51,20 +52,29 @@ import 'features/reading_lists/reading_lists_page.dart';
 import 'features/media/media_page.dart';
 import 'screens/placeholder_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // تهيئة جلسة الصوت قبل أول تشغيل — بدونها يخضع الصوت على iOS لمفتاح
+  // الكتم الجانبي. الفشل هنا لا يمنع إقلاع التطبيق: أسوأ أثره أن يصمت
+  // التشغيل مع جهاز مكتوم، وهو أهون من شاشة سوداء عند الإقلاع.
+  try {
+    await configureAudioSession();
+  } catch (_) {}
+
   runApp(const ProviderScope(child: RawayaApp()));
 }
 
 class RawayaRoutes {
-  // مسارات لم تُبنَ شاشاتها الحقيقية بعد — إما خارج نطاق MVP صراحة
-  // (الاشتراكات المدفوعة، مستبعدة عمدًا حسب الطلب الأصلي) أو مشغلات وسائط
-  // مستقلة بلا سياق (لا يوجد رابط فعلي لأي مقطع محدد بعد — قائمة الوسائط
-  // نفسها حقيقية ومربوطة). البلاغات كميزة مستقلة غير مطلوبة لأن الإبلاغ
-  // يعمل فعليًا من الورقة السفلية العامة على صفحات المحتوى.
+  // مسارات لم تُبنَ شاشاتها الحقيقية بعد: الاشتراكات المدفوعة مستبعدة عمدًا
+  // حسب الطلب الأصلي، والبلاغات كميزة مستقلة غير مطلوبة لأن الإبلاغ يعمل
+  // فعليًا من الورقة السفلية العامة على صفحات المحتوى.
+  //
+  // مشغّلا الصوت والفيديو حُذفا من هذه القائمة: التشغيل صار حقيقيًا داخل
+  // سياق المادة (مضمَّنًا في بطاقة التسجيل، وبشاشة كاملة للمرئي) لا كشاشة
+  // مشغّل مستقلة بلا مقطع محدد.
   static const placeholders = [
     '/subscriptions',
-    '/audio-player',
-    '/video-player',
     '/reports',
   ];
 
@@ -72,10 +82,6 @@ class RawayaRoutes {
     switch (route) {
       case '/subscriptions':
         return 'الاشتراكات';
-      case '/audio-player':
-        return 'مشغل الصوت';
-      case '/video-player':
-        return 'مشغل الفيديو';
       case '/reports':
         return 'البلاغات';
       default:

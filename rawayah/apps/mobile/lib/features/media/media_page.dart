@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/api_client.dart';
+import '../../core/media_playback.dart';
 import '../../core/theme.dart';
 
 class MediaPage extends StatefulWidget {
@@ -9,6 +10,65 @@ class MediaPage extends StatefulWidget {
 
   @override
   State<MediaPage> createState() => _MediaPageState();
+}
+
+/// بطاقة مادة في قائمة الوسائط العامة — تشغّل داخل التطبيق لا تكتفي بالعرض.
+class _MediaCard extends StatelessWidget {
+  const _MediaCard({
+    required this.icon,
+    required this.title,
+    required this.url,
+    required this.isVideo,
+    this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final String? url;
+  final bool isVideo;
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaUrl = url;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ListTile(
+            leading: Icon(icon, color: context.rawaya.gold),
+            title: Text(title),
+            subtitle: subtitle != null ? Text(subtitle!) : null,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+            child: mediaUrl == null || mediaUrl.isEmpty
+                ? const RawayaMediaUnavailableNote()
+                : isVideo
+                    ? Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: OutlinedButton.icon(
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => RawayaVideoPlayerPage(url: mediaUrl, title: title),
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: context.rawaya.gold,
+                            side: BorderSide(color: context.rawaya.gold),
+                          ),
+                          icon: const Icon(Icons.play_circle_outline, size: 20),
+                          label: const Text('تشغيل المقطع'),
+                        ),
+                      )
+                    : RawayaAudioPlayer(key: ValueKey(mediaUrl), url: mediaUrl, title: title),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _MediaPageState extends State<MediaPage> {
@@ -68,10 +128,14 @@ class _MediaPageState extends State<MediaPage> {
                               child: Text('التسجيلات الصوتية', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
                             ),
                             ..._audios.map(
-                              (a) => ListTile(
-                                leading: const Icon(Icons.headphones_outlined),
-                                title: Text(a['title']?.toString() ?? ''),
-                                subtitle: a['narrator'] != null ? Text('الراوي: ${a['narrator']}') : null,
+                              (a) => _MediaCard(
+                                icon: Icons.headphones_outlined,
+                                title: a['title']?.toString() ?? '',
+                                subtitle: a['narrator'] != null ? 'الراوي: ${a['narrator']}' : null,
+                                // الخادم يعيد `fileUrl` رابطًا موقَّعًا جاهزًا
+                                // للتشغيل (انظر `resolveTrackUrl`)، لا مفتاح تخزين.
+                                url: a['fileUrl']?.toString(),
+                                isVideo: false,
                               ),
                             ),
                           ],
@@ -81,9 +145,12 @@ class _MediaPageState extends State<MediaPage> {
                               child: Text('المقاطع المرئية', style: TextStyle(fontWeight: FontWeight.bold, color: context.rawaya.textPrimary)),
                             ),
                             ..._videos.map(
-                              (v) => ListTile(
-                                leading: const Icon(Icons.videocam_outlined),
-                                title: Text(v['title']?.toString() ?? ''),
+                              (v) => _MediaCard(
+                                icon: Icons.videocam_outlined,
+                                title: v['title']?.toString() ?? '',
+                                subtitle: v['description']?.toString(),
+                                url: v['fileUrl']?.toString(),
+                                isVideo: true,
                               ),
                             ),
                           ],

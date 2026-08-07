@@ -125,8 +125,43 @@ enum PolicyDocumentCode {
   COPYRIGHT_POLICY
   TAKEDOWN_POLICY
   SOURCE_POLICY
+  CITATION_POLICY
   ORAL_HISTORY_POLICY
+  RIGHTS_POLICY
+  REPORTING_POLICY
+  ACCOUNT_DELETION_POLICY
   COMMUNITY_GUIDELINES
+}
+
+// نوع التعارض بين مصدرين — يحدد طبيعة الخلاف لا مجرد وجوده.
+enum SourceConflictType {
+  ATTRIBUTION      // نسبة النص إلى قائل مختلف
+  TEXT_VARIANT     // اختلاف في نص القصيدة أو الرواية
+  DATE             // اختلاف في تاريخ ميلاد أو وفاة أو حدث
+  PLACE            // اختلاف في المكان
+  LINEAGE          // اختلاف في النسب أو القبيلة
+  EVENT_DETAIL     // اختلاف في تفاصيل حدث
+  NAME             // اختلاف في الاسم أو الكنية أو اللقب
+  OTHER
+}
+
+// مستوى الثقة في حسم الخلاف — منفصل عن حالة الحسم نفسها، فقد يُرجَّح
+// طرف بثقة منخفضة، وهذا يجب أن يظهر لا أن يختفي خلف كلمة "محسوم".
+enum ConflictConfidence {
+  UNRESOLVED
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// نتيجة مراجعة المالك للخلاف. القيمة الافتراضية `PENDING` مقصودة:
+// لا يُحسم خلاف تلقائيًا بلا مراجعة بشرية.
+enum ConflictResolution {
+  PENDING
+  SOURCE_A_PREFERRED
+  SOURCE_B_PREFERRED
+  BOTH_PUBLISHED_AS_DISPUTED
+  INSUFFICIENT_EVIDENCE
 }
 
 // نوع الموافقة الصريحة المسجَّلة على المستخدم.
@@ -296,6 +331,7 @@ model User {
   publishedPoetFileItems   PoetFileItem[] @relation("PoetFileItemPublishedBy")
   consentRecords           ConsentRecord[] @relation("ConsentRecordUser")
   policyAcceptances        PolicyAcceptance[] @relation("PolicyAcceptanceUser")
+  reviewedSourceConflicts  SourceConflict[]
 }
 
 model Profile {
@@ -815,6 +851,8 @@ model Source {
   lineageAsSource SourceLineage[] @relation("SourceLineageSource")
   lineageAsParent SourceLineage[] @relation("SourceLineageParent")
   poetFileItems  PoetFileItem[]
+  conflictsAsA   SourceConflict[] @relation("SourceConflictA")
+  conflictsAsB   SourceConflict[] @relation("SourceConflictB")
 }
 
 model ContentSource {
@@ -1189,8 +1227,61 @@ model TrustAssessment {
   updatedAt              DateTime @updatedAt
 
   reviewedBy User? @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+  conflicts  SourceConflict[]
 
   @@unique([contentType, contentId])
+}
+
+// تعارض المصادر: عندما يختلف مصدران على نفس المعلومة، يُحفظ الخلاف نفسه
+// سجلًّا مستقلًا لا يُحذف ولا يُحسم تلقائيًا.
+//
+// الحقل `hasConflictingSources` على بطاقة الثقة كان علمًا منطقيًا فقط —
+// يقول "هناك خلاف" ولا يقول ما هو ولا بين مَن، فلا يمكن للمراجع أن يبني
+// عليه قرارًا ولا للقارئ أن يفهم منه شيئًا. هذا النموذج يحفظ الخلاف
+// بتفاصيله كاملة كما تقتضي سياسة المصادر.
+model SourceConflict {
+  id          String      @id @default(cuid())
+  contentType ContentType
+  contentId   String
+
+  // موضع الخلاف بدقة: قد يكون على القصيدة كاملة، أو على بيت واحد منها،
+  // أو على تاريخ وفاة شاعر. تركه مبهمًا يجعل السجل بلا فائدة عملية.
+  subject     String
+
+  conflictType SourceConflictType
+
+  // كل طرف بمصدره وبنص الرواية التي يدعمها ذلك المصدر تحديدًا. لا يُكتفى
+  // بربط المصدرين دون نص، لأن الخلاف في المضمون لا في هوية المصدر.
+  sourceAId      String
+  sourceAClaim   String
+  sourceBId      String
+  sourceBClaim   String
+
+  // مصادر إضافية تؤيد أحد الطرفين أو تطرح ثالثًا — الخلاف قد يكون ثلاثيًا،
+  // فتُسجَّل البقية هنا بدل إجبارها على ثنائية لا تمثّلها.
+  additionalNotes String?
+
+  reviewerNotes  String?
+  confidence     ConflictConfidence @default(UNRESOLVED)
+  resolution     ConflictResolution @default(PENDING)
+
+  // عند تعذّر الحسم تُنشر المادة موسومة «مختلف فيها»، وهذا النص هو ما
+  // يُعرض للقارئ بجوارها.
+  publicDisputeNote String?
+
+  trustAssessmentId String?
+  reviewedById      String?
+  resolvedAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  sourceA         Source           @relation("SourceConflictA", fields: [sourceAId], references: [id], onDelete: Cascade)
+  sourceB         Source           @relation("SourceConflictB", fields: [sourceBId], references: [id], onDelete: Cascade)
+  trustAssessment TrustAssessment? @relation(fields: [trustAssessmentId], references: [id], onDelete: SetNull)
+  reviewedBy      User?            @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([contentType, contentId])
+  @@index([resolution])
 }
 
 // التوثيق على مستوى الفقرة: يقسّم أي عنصر محتوى إلى وحدات أصغر

@@ -142,7 +142,10 @@ async function main() {
       create: {
         email: 'user@rawaya.test',
         status: 'ACTIVE',
-        passwordHash: await argon2.hash('user123'),
+        // ثمانية أحرف على الأقل — الحد الأدنى الذي يفرضه LoginDto. كانت
+        // 'user123' بسبعة أحرف، فكان الحساب المزروع يُنشأ سليمًا في القاعدة
+        // ويُرفض عند الدخول بخطأ تحقق، لا بخطأ بيانات اعتماد.
+        passwordHash: await argon2.hash('user1234'),
         profile: { create: { displayName: 'مستخدم تجريبي' } },
         userRoles: { create: { roleId: userRole.id } },
       },
@@ -172,14 +175,18 @@ async function main() {
     { slug: 'ritha', nameAr: 'شعر الرثاء', dimension: 'THEME', sortOrder: 3 },
     { slug: 'madh', nameAr: 'شعر المدح', dimension: 'THEME', sortOrder: 4 },
     { slug: 'hija', nameAr: 'شعر الهجاء', dimension: 'THEME', sortOrder: 5 },
-    { slug: 'fakhr-hamasah', nameAr: 'شعر الفخر والحماسة', dimension: 'THEME', sortOrder: 6 },
-    { slug: 'furusiyyah', nameAr: 'شعر الفروسية', dimension: 'THEME', sortOrder: 7 },
-    { slug: 'karam', nameAr: 'شعر الكرم', dimension: 'THEME', sortOrder: 8 },
-    { slug: 'wasf', nameAr: 'شعر الوصف', dimension: 'THEME', sortOrder: 9 },
-    { slug: 'munasabat', nameAr: 'شعر المناسبات', dimension: 'THEME', sortOrder: 10 },
-    { slug: 'khayl', nameAr: 'شعر الخيل', dimension: 'THEME', sortOrder: 11 },
-    { slug: 'ibil', nameAr: 'شعر الإبل', dimension: 'THEME', sortOrder: 12 },
-    { slug: 'saqarah-qans', nameAr: 'شعر الصقارة والقنص', dimension: 'THEME', sortOrder: 13 },
+    // الفخر والحماسة غرضان متجاوران لا مترادفان: الفخر بالنفس والقبيلة،
+    // والحماسة في الحرب والبأس. فُصلا كما وردا في المواصفة، والدمج متاح
+    // من لوحة المالك لمن رأى غير ذلك.
+    { slug: 'fakhr', nameAr: 'شعر الفخر', dimension: 'THEME', sortOrder: 6 },
+    { slug: 'hamasah', nameAr: 'شعر الحماسة', dimension: 'THEME', sortOrder: 7 },
+    { slug: 'furusiyyah', nameAr: 'شعر الفروسية', dimension: 'THEME', sortOrder: 8 },
+    { slug: 'karam', nameAr: 'شعر الكرم', dimension: 'THEME', sortOrder: 9 },
+    { slug: 'wasf', nameAr: 'شعر الوصف', dimension: 'THEME', sortOrder: 10 },
+    { slug: 'munasabat', nameAr: 'شعر المناسبات', dimension: 'THEME', sortOrder: 11 },
+    { slug: 'khayl', nameAr: 'شعر الخيل', dimension: 'THEME', sortOrder: 12 },
+    { slug: 'ibil', nameAr: 'شعر الإبل', dimension: 'THEME', sortOrder: 13 },
+    { slug: 'saqarah-qans', nameAr: 'شعر الصقارة والقنص', dimension: 'THEME', sortOrder: 14 },
 
     { slug: 'ardah', nameAr: 'العرضة والشعر المرتبط بالفنون الشعبية', dimension: 'PERFORMANCE', sortOrder: 1 },
     { slug: 'mughannat-munshadah', nameAr: 'القصائد المغناة أو المنشدة', dimension: 'PERFORMANCE', sortOrder: 2 },

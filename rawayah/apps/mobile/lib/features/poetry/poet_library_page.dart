@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/api_client.dart';
+import '../../core/media_playback.dart';
 import '../../core/theme.dart';
 
 /// مكتبة الشاعر: تبويبات تُبنى من استجابة الخادم، والتبويب الفارغ
@@ -276,31 +277,94 @@ class _PoetLibraryPageState extends State<PoetLibraryPage> {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: ListTile(
-        leading: Icon(icon, color: context.rawaya.gold),
-        title: Text(item['title']?.toString() ?? ''),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (item['description'] != null) Text(item['description'].toString()),
-            if (item['bodyText'] != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(item['bodyText'].toString(), style: const TextStyle(height: 1.7)),
-              ),
-            if (subtitleParts.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  subtitleParts.join(' • '),
-                  style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
-                ),
-              ),
-          ],
-        ),
-        isThreeLine: subtitleParts.isNotEmpty,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ListTile(
+            leading: Icon(icon, color: context.rawaya.gold),
+            title: Text(item['title']?.toString() ?? ''),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (item['description'] != null) Text(item['description'].toString()),
+                if (item['bodyText'] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(item['bodyText'].toString(), style: const TextStyle(height: 1.7)),
+                  ),
+                if (subtitleParts.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      subtitleParts.join(' • '),
+                      style: TextStyle(fontSize: 12, color: context.rawaya.textSecondary),
+                    ),
+                  ),
+              ],
+            ),
+            isThreeLine: subtitleParts.isNotEmpty,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+            child: _playback(item),
+          ),
+        ],
       ),
     );
+  }
+
+  /// التشغيل داخل البطاقة نفسها حسب نوع المادة. المواد النصية والوثائق
+  /// والروابط لا تُعرض هنا شيئًا — نصّها معروض أعلاه أصلًا.
+  Widget _playback(Map<String, dynamic> item) {
+    final kind = item['kind']?.toString();
+    if (kind != 'AUDIO' && kind != 'VIDEO' && kind != 'IMAGE') {
+      return const SizedBox.shrink();
+    }
+
+    // الخادم يُفرغ الرابط عمدًا للمواد التي لم تُجَز حقوقها — تُشرح الحالة
+    // بدل إظهار مشغّل يفشل عند الضغط.
+    final url = item['mediaUrl']?.toString();
+    if (url == null || url.isEmpty) return const RawayaMediaUnavailableNote();
+
+    final title = item['title']?.toString();
+
+    switch (kind) {
+      case 'AUDIO':
+        return RawayaAudioPlayer(key: ValueKey(url), url: url, title: title);
+      case 'VIDEO':
+        return Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => RawayaVideoPlayerPage(url: url, title: title),
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: context.rawaya.gold,
+              side: BorderSide(color: context.rawaya.gold),
+            ),
+            icon: const Icon(Icons.play_circle_outline, size: 20),
+            label: const Text('تشغيل المقطع'),
+          ),
+        );
+      default:
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            url,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, progress) => progress == null
+                ? child
+                : SizedBox(
+                    height: 120,
+                    child: Center(child: CircularProgressIndicator(color: context.rawaya.gold)),
+                  ),
+            // فشل تحميل الصورة لا يكسر البطاقة ولا يترك مربعًا فارغًا غامضًا.
+            errorBuilder: (context, _, __) => const RawayaMediaUnavailableNote(),
+          ),
+        );
+    }
   }
 
   Widget _storiesTab() {
