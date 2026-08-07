@@ -1,28 +1,33 @@
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { get } from '../lib/http';
+import type { GetServerSideProps } from 'next';
+import { ContentListPage } from '../components/ContentPage';
+import { ssrGet } from '../lib/ssr';
 
-type Poet = { id: string; fullName: string; knownAs?: string; region?: string };
+type Poet = { id: string; fullName: string; knownAs?: string; region?: string; era?: string };
 
-export default function PoetsPage() {
-  const [poets, setPoets] = useState<Poet[]>([]);
-
-  useEffect(() => {
-    get<Poet[]>('/poets').then(setPoets).catch(() => setPoets([]));
-  }, []);
-
+export default function PoetsPage({ items, failed }: { items: Poet[]; failed: boolean }) {
   return (
-    <main className="home">
-      <h1>الشعراء</h1>
-      <ul>
-        {poets.map((p) => (
-          <li key={p.id}>
-            <h3><Link href={`/poets/${p.id}`}>{p.fullName}</Link></h3>
-            {p.knownAs ? <p>{p.knownAs}</p> : null}
-            {p.region ? <small>{p.region}</small> : null}
-          </li>
-        ))}
-      </ul>
-    </main>
+    <ContentListPage
+      title="الشعراء"
+      description="شعراء العربية قديمًا وحديثًا: أسماؤهم وعصورهم ومناطقهم، ولكل شاعر مكتبة تجمع قصائده وتسجيلاته ووثائقه."
+      path="/poets"
+      items={items}
+      failed={failed}
+      emptyText="لا يوجد شعراء منشورون بعد."
+      renderItem={(item) => (
+        <>
+          <h3>
+            <Link href={`/poets/${item.id}`}>{item.fullName}</Link>
+          </h3>
+          {item.knownAs ? <p>{item.knownAs}</p> : null}
+          <small>{[item.era, item.region].filter(Boolean).join(' • ')}</small>
+        </>
+      )}
+    />
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { data, failed } = await ssrGet<Poet[]>('/poets');
+  return { props: { items: data ?? [], failed } };
+};

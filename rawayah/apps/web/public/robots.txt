@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# صفحات الحساب لا تُفهرس: لا قيمة لها في نتائج البحث، وفهرستها تدعو
+# الزاحف إلى مسارات تتطلب تسجيل دخول فيقرأها كأخطاء متكررة.
+Disallow: /account
+Disallow: /login
+Disallow: /register
+Disallow: /reading-lists
+Disallow: /payments
+
+Sitemap: /sitemap.xml
