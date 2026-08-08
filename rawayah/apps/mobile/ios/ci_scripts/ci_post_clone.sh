@@ -12,6 +12,11 @@ fi
 
 export PATH="${HOME}/flutter/bin:${PATH}"
 
+# المشروع يعتمد على CocoaPods لكل الإضافات، لا Swift Package Manager.
+# نسخ Flutter الحديثة تحاول دمج SPM تلقائيًا لإضافات توفّر Package.swift
+# (مثل تبعية file_picker)، وتفشل في بيئة CI لغياب حل تفاعلي — تعطيله صراحة.
+flutter config --no-enable-swift-package-manager
+
 flutter --version
 flutter precache --ios
 flutter pub get
