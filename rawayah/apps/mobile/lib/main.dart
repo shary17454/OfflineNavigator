@@ -259,7 +259,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
     ],
-    initialLocation: '/',
+    initialLocation: const String.fromEnvironment('SCREENSHOT_ROUTE', defaultValue: '/'),
   );
 });
 

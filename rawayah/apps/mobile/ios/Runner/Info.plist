@@ -28,6 +28,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>يحتاج موروث الوصول لمكتبة الصور لإتاحة رفع صور أو ملفات وسائط عند إضافة مساهمة لمكتبة أحد الشعراء.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

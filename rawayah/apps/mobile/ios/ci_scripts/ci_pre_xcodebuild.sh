@@ -12,7 +12,8 @@ if command -v xattr >/dev/null 2>&1; then
   xattr -cr . || true
 fi
 
-flutter build ios --release --no-codesign
+flutter build ios --release --no-codesign \
+  --dart-define=API_BASE_URL=https://rawaya-api-production.up.railway.app/api
 
 if command -v xattr >/dev/null 2>&1; then
   xattr -cr build/ios || true
