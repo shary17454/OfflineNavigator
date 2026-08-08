@@ -8,6 +8,16 @@ import { join } from 'node:path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
+
+  // الموقع العام ولوحة المالك يستدعيان الـAPI من متصفح على دومين مختلف
+  // في الإنتاج — بلا CORS يرفض المتصفح الطلب قبل وصوله للخادم أصلًا.
+  // ALLOWED_ORIGINS غائب = وضع تطوير محلي، كل الأصول مسموحة.
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim());
+  app.enableCors({
+    origin: allowedOrigins && allowedOrigins.length > 0 ? allowedOrigins : true,
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, stopAtFirstError: false }),
   );
